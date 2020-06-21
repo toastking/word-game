@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/toastking/word-game#readme",
   "dependencies": {
+    "@colyseus/command": "^0.1.5",
+    "@colyseus/schema": "^0.5.39",
     "colyseus": "^0.13.7"
   }
 }
