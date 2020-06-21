@@ -1,5 +1,7 @@
 import { Room, Client } from "colyseus";
 import { Schema, type, MapSchema } from "@colyseus/schema";
+import { Dispatcher } from "@colyseus/command";
+import { OnJoinCommand } from "./PlayerCommands";
 
 export class Player extends Schema {
   @type("string")
@@ -16,6 +18,8 @@ export class WordGameState extends Schema {
 }
 
 export class GameRoom extends Room<WordGameState> {
+  readonly dispatcher = new Dispatcher(this);
+
   onCreate(options: any) {
     //Set the intial State
     this.setState(new WordGameState());
@@ -25,7 +29,12 @@ export class GameRoom extends Room<WordGameState> {
     });
   }
 
-  onJoin(client: Client, options: any) {}
+  onJoin(client: Client, options: any) {
+    this.dispatcher.dispatch(new OnJoinCommand(), {
+      sessionId: client.sessionId,
+      name: options?.name,
+    });
+  }
 
   onLeave(client: Client, consented: boolean) {}
 
