@@ -1,6 +1,20 @@
 <template>
   <div id="app">
-    <div id="nav"><router-link to="/">Home</router-link> |</div>
+    <b-navbar>
+      <template slot="brand">
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+          Zooted Word Game
+        </b-navbar-item>
+      </template>
+      <template slot="end">
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+          Home
+        </b-navbar-item>
+        <b-navbar-item tag="router-link" :to="{ path: '/create' }">
+          Create Game
+        </b-navbar-item>
+      </template>
+    </b-navbar>
     <router-view />
   </div>
 </template>

@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
+import CreateGame from "../views/CreateGame.vue";
 
 Vue.use(VueRouter);
 
@@ -10,6 +11,7 @@ const routes: Array<RouteConfig> = [
     name: "Home",
     component: Home,
   },
+  { path: "/create", name: "CreateGame", component: CreateGame },
 ];
 
 const router = new VueRouter({
