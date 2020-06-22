@@ -8,7 +8,7 @@ export class Tile extends Schema {
   @type("string")
   letter: string;
   @type("number")
-  points: number;
+  points: number = 0;
 }
 
 export class Player extends Schema {
@@ -57,5 +57,7 @@ export class GameRoom extends Room<WordGameState> {
 
   onLeave(client: Client, consented: boolean) {}
 
-  onDispose() {}
+  onDispose() {
+    this.dispatcher.stop();
+  }
 }
