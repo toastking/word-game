@@ -21,6 +21,7 @@ export class GameRoom extends Room<WordGameState> {
   readonly dispatcher = new Dispatcher(this);
 
   onCreate(options: any) {
+    console.log("created");
     //Set the intial State
     this.setState(new WordGameState());
 
@@ -30,6 +31,7 @@ export class GameRoom extends Room<WordGameState> {
   }
 
   onJoin(client: Client, options: any) {
+    console.log("joined");
     this.dispatcher.dispatch(new OnJoinCommand(), {
       sessionId: client.sessionId,
       name: options?.name,
