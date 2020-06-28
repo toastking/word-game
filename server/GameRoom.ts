@@ -23,7 +23,7 @@ export class PlacedTile extends Schema {
 
 export class Player extends Schema {
   @type("string")
-  name: string;
+  name: string = "";
   @type("number")
   score: number = 0;
   // The list of tiles the player can play

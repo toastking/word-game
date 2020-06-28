@@ -1,4 +1,4 @@
-import { Room } from "./__mocks__/colyseus";
+import { Room } from "./mock/colyseus";
 import { WordGameState, Player } from "./GameRoom";
 import { Dispatcher } from "@colyseus/command";
 import { OnJoinCommand, OnLeaveCommand } from "./PlayerCommands";

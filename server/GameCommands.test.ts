@@ -8,7 +8,7 @@ import {
   BuildVerticalWordCommand,
 } from "./GameCommands";
 import { PlacedTile, Player, Tile, WordGameState } from "./GameRoom";
-import { Room } from "./__mocks__/colyseus";
+import { Room } from "./mock/colyseus";
 
 describe("GameCommands", () => {
   let room: Room<WordGameState>;
@@ -188,10 +188,16 @@ describe("GameCommands", () => {
       "%s",
       (_, placedTile, gameBoard, [expectedBoard, expectedPlacedTiles]) => {
         room.state.gameBoard.push(...gameBoard);
+        const player = new Player();
+        player.hand.push(placedTile.tile);
+        room.state.players["id"] = player;
 
         const dispatcher = new Dispatcher(room);
 
-        dispatcher.dispatch(new PlaceTileCommand(), { tile: placedTile });
+        dispatcher.dispatch(new PlaceTileCommand(), {
+          tile: placedTile,
+          sessionId: "id",
+        });
 
         expect(room.state.gameBoard).toEqual(expectedBoard);
         expect(room.state.placedTiles).toEqual(expectedPlacedTiles);
@@ -252,13 +258,20 @@ describe("GameCommands", () => {
         [expectedBoard, expectedPlacedTiles]
       ) => {
         room.state.gameBoard.push(...gameBoard);
+        const player = new Player();
+        player.hand.push(placedTile.tile);
+        room.state.players["id"] = player;
+
         placedTiles.forEach((tile) => {
           room.state.placedTiles.push(tile);
         });
 
         const dispatcher = new Dispatcher(room);
 
-        dispatcher.dispatch(new RemoveTileCommand(), { tile: placedTile });
+        dispatcher.dispatch(new RemoveTileCommand(), {
+          tile: placedTile,
+          sessionId: "id",
+        });
 
         expect(room.state.gameBoard).toEqual(expectedBoard);
         expect(room.state.placedTiles).toEqual(expectedPlacedTiles);

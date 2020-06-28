@@ -15,32 +15,36 @@ export class InitializeGameBoardCommand extends Command<WordGameState, {}> {
   }
 }
 
-//TODO: add a method to place a tile, check that a tile makes a good word, and then add to a score
 /** Command to place a tile when a user requests it */
 export class PlaceTileCommand extends Command<
   WordGameState,
-  { tile: PlacedTile }
+  { tile: PlacedTile; sessionId: string }
 > {
   validate({ tile }: this["payload"]) {
     // You can only place tiles on empty game board spaces
     return isEmptySpace(tile.row, tile.column, this.state.gameBoard);
   }
 
-  execute({ tile }: this["payload"]) {
+  execute({ tile, sessionId }: this["payload"]) {
     //Add the tile to the board and to the list of tiles
-
     this.state.gameBoard[calculatedIndex(tile.row, tile.column)] = tile.tile;
-
     this.state.placedTiles.push(tile);
+    //Remove the tile from the players hand
+    const player: Player = this.state.players[sessionId];
+    const idxToRemove = player.hand.findIndex(
+      (t) => t.letter === tile.tile.letter
+    );
+    (this.state.players[sessionId] as Player).hand.splice(idxToRemove, 1);
   }
 }
 
 /** Command to remove a tile */
 export class RemoveTileCommand extends Command<
   WordGameState,
-  { tile: PlacedTile }
+  { tile: PlacedTile; sessionId: string }
 > {
   validate({ tile }: this["payload"]) {
+    //TODO: add some validation to check if it's the players current turn
     // Check that it's actually in the list of placed tiles
     return this.state.placedTiles.some(
       (placedTile) =>
@@ -48,7 +52,7 @@ export class RemoveTileCommand extends Command<
     );
   }
 
-  execute({ tile }: this["payload"]) {
+  execute({ tile, sessionId }: this["payload"]) {
     const indexToRemove = this.state.placedTiles.findIndex(
       (placedTile) =>
         placedTile.row === tile.row && placedTile.column === tile.column
@@ -61,6 +65,9 @@ export class RemoveTileCommand extends Command<
         1,
         new Tile()
       );
+
+      //Add the removed tile to the players hand
+      (this.state.players[sessionId] as Player).hand.push(tile.tile);
     }
   }
 }

@@ -58,26 +58,21 @@ export class CreateDeckCommand extends Command<WordGameState, {}> {
   }
 }
 
-/** Command to draw tiles at the end of a player turn */
-export class DrawCardCommand extends Command<
+/** Max number of tiles in hand */
+export const MAX_HAND = 7;
+
+/** Command to draw tiles after the user has taken them from their hand */
+export class DrawTilesCommand extends Command<
   WordGameState,
   { sessionId: string }
 > {
   execute({ sessionId }: this["payload"]) {
-    if (sessionId === this.state.currentTurn) {
-      // Get the tiles to draw for the player
-      const currentPlayer: Player = this.state.players[sessionId];
-      const tilesToDraw = MAX_TILES_IN_HAND - currentPlayer.hand.length;
-
-      for (let i = 0; i < tilesToDraw; i++) {
-        // Pick a random index in the deck of tiles, then remove the tile and add it to the players hand
-        const tileIndex = Math.floor(
-          Math.random() * this.state.tileDeck.length
-        );
-        const drawnTile: Tile = this.state.tileDeck.splice(tileIndex, 1);
-
-        (this.state.players[sessionId] as Player).hand.push(drawnTile);
-      }
+    const player: Player = this.state.players[sessionId];
+    const toDraw = MAX_HAND - player.hand.length;
+    for (let i = 0; i < toDraw; i++) {
+      const randomIdx = Math.floor(Math.random() * this.state.tileDeck.length);
+      const drawnTile = this.state.tileDeck.splice(randomIdx, 1);
+      (this.state.players[sessionId] as Player).hand.push(drawnTile);
     }
   }
 }
