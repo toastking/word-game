@@ -57,6 +57,7 @@ export class GameRoom extends Room<WordGameState> {
 
   onCreate(options: any) {
     console.log("created");
+    this.maxClients = 4;
     //Set the intial State
     this.setState(new WordGameState());
 
