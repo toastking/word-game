@@ -1,7 +1,11 @@
 import { Room } from "./mock/colyseus";
 import { WordGameState, Player } from "./GameRoom";
 import { Dispatcher } from "@colyseus/command";
-import { OnJoinCommand, OnLeaveCommand } from "./PlayerCommands";
+import {
+  OnJoinCommand,
+  OnLeaveCommand,
+  NextPlayerCommand,
+} from "./PlayerCommands";
 
 describe("PlayerCommands", () => {
   let room: Room<WordGameState>;
@@ -28,5 +32,16 @@ describe("PlayerCommands", () => {
     });
 
     expect(room.state.players).toEqual({});
+  });
+
+  test("NextPlayerCommand goes to the next player", () => {
+    room.state.players["id"] = new Player();
+    room.state.players["id2"] = new Player();
+    room.state.currentTurn = "id";
+
+    const dispatcher = new Dispatcher(room);
+    dispatcher.dispatch(new NextPlayerCommand());
+
+    expect(room.state.currentTurn).toBe("id2");
   });
 });

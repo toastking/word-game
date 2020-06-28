@@ -10,7 +10,7 @@ describe("TileCommands", () => {
     room.setState(new WordGameState());
   });
 
-  test("draws a random hand for a player", () => {
+  test.skip("draws a random hand for a player", () => {
     const state = new WordGameState();
     state.players["id"] = new Player();
     //Initialize the deck

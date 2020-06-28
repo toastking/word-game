@@ -29,6 +29,11 @@ export class Player extends Schema {
   // The list of tiles the player can play
   @type([Tile])
   hand = new ArraySchema<Tile>();
+
+  constructor(name?: string, id?: string) {
+    super();
+    this.name = name;
+  }
 }
 
 export class WordGameState extends Schema {
