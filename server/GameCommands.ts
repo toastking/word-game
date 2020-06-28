@@ -21,7 +21,16 @@ export class PlaceTileCommand extends Command<
   WordGameState,
   { tile: PlacedTile }
 > {
+  validate({ tile }: this["payload"]) {
+    // You can only place tiles on empty game board spaces
+    return isEmptySpace(tile.row, tile.column, this.state.gameBoard);
+  }
+
   execute({ tile }: this["payload"]) {
+    //Add the tile to the board and to the list of tiles
+
+    this.state.gameBoard[calculatedIndex(tile.row, tile.column)] = tile.tile;
+
     this.state.placedTiles.push(tile);
   }
 }

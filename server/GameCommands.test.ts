@@ -3,6 +3,7 @@ import {
   BOARD_SIZE,
   BuildHorizontalWordCommand,
   calculatedIndex,
+  PlaceTileCommand,
 } from "./GameCommands";
 import { PlacedTile, Player, Tile, WordGameState } from "./GameRoom";
 import { Room } from "./__mocks__/colyseus";
@@ -73,6 +74,62 @@ describe("GameCommands", () => {
         dispatcher.dispatch(new BuildHorizontalWordCommand());
 
         expect((room.state.players["id"] as Player).score).toBe(expectedScore);
+      }
+    );
+  });
+
+  describe("PlaceTileCommand", () => {
+    type PlaceTileTestExpectedTupe = [Tile[], PlacedTile[]];
+    type PlaceTileTestTuple = [
+      string,
+      PlacedTile,
+      Tile[],
+      PlaceTileTestExpectedTupe
+    ];
+
+    // Test One: invalid space
+    const board1: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
+    const tile1 = new PlacedTile();
+    tile1.column = 0;
+    tile1.row = 4;
+    const tile1Tile = new Tile();
+    tile1Tile.letter = "A";
+    tile1Tile.points = 2;
+    tile1.tile = tile1Tile;
+    board1[calculatedIndex(tile1.row, tile1.column)] = tile1Tile;
+
+    //Test 2 valid placement
+    const board2: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
+    const tile2 = new PlacedTile();
+    tile2.column = 0;
+    tile2.row = 4;
+    const tile2Tile = new Tile();
+    tile2Tile.letter = "A";
+    tile2Tile.points = 2;
+    tile2.tile = tile2Tile;
+    const expectedBoard2 = [...board2];
+    expectedBoard2[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
+    const expectedPlacedTiles2 = [tile2];
+
+    test.each<PlaceTileTestTuple>([
+      ["Invalid placement", tile1, board1, [board1, []]],
+      [
+        "Valid placement",
+        tile2,
+        board2,
+        [expectedBoard2, expectedPlacedTiles2],
+      ],
+    ])(
+      "%s",
+      (_, placedTile, gameBoard, [expectedBoard, expectedPlacedTiles]) => {
+        room.state.gameBoard.push(...gameBoard);
+
+        const dispatcher = new Dispatcher(room);
+
+        dispatcher.dispatch(new PlaceTileCommand(), { tile: placedTile });
+
+        expect(room.state.gameBoard).toEqual(expectedBoard);
+        expect(room.state.placedTiles).toEqual(expectedPlacedTiles);
       }
     );
   });
