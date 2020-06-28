@@ -3,7 +3,12 @@ import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 import { Dispatcher } from "@colyseus/command";
 import { OnJoinCommand, OnLeaveCommand } from "./PlayerCommands";
 import { CreateDeckCommand } from "./TileCommands";
-import { OnCreateCommand } from "./GameCommands";
+import {
+  OnCreateCommand,
+  PlaceTileCommand,
+  RemoveTileCommand,
+} from "./GameCommands";
+import { number } from "@colyseus/schema/lib/encoding/decode";
 
 /** Repressents a game tile */
 export class Tile extends Schema {
@@ -21,6 +26,14 @@ export class PlacedTile extends Schema {
   column: number;
   @type(Tile)
   tile: Tile;
+
+  constructor(row: number, column: number, tile: Tile) {
+    super();
+
+    this.row = row;
+    this.column = column;
+    this.tile = tile;
+  }
 }
 
 export class Player extends Schema {
@@ -77,6 +90,36 @@ export class GameRoom extends Room<WordGameState> {
     this.onMessage("type", (client, message) => {
       // handle "type" message
     });
+
+    this.onMessage(
+      "placeTile",
+      (client, message: { row: number; column: number; tile: Tile }) => {
+        const placedTile = new PlacedTile(
+          message.row,
+          message.column,
+          message.tile
+        );
+        this.dispatcher.dispatch(new PlaceTileCommand(), {
+          tile: placedTile,
+          sessionId: client.sessionId,
+        });
+      }
+    );
+
+    this.onMessage(
+      "removeTile",
+      (client, message: { row: number; column: number; tile: Tile }) => {
+        const placedTile = new PlacedTile(
+          message.row,
+          message.column,
+          message.tile
+        );
+        this.dispatcher.dispatch(new RemoveTileCommand(), {
+          tile: placedTile,
+          sessionId: client.sessionId,
+        });
+      }
+    );
   }
 
   onJoin(client: Client, options: any) {

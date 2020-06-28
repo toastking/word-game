@@ -20,22 +20,16 @@ describe("GameCommands", () => {
   describe("BuildHorizontalWordsCommand", () => {
     // FIRST TEST : no intersections
     const board1: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
-    const tile1 = new PlacedTile();
-    tile1.column = 0;
-    tile1.row = 4;
     const tile1Tile = new Tile();
     tile1Tile.letter = "A";
     tile1Tile.points = 2;
-    tile1.tile = tile1Tile;
+    const tile1 = new PlacedTile(4, 0, tile1Tile);
     board1[calculatedIndex(tile1.row, tile1.column)] = tile1Tile;
 
-    const tile2 = new PlacedTile();
-    tile2.column = 1;
-    tile2.row = 4;
     const tile2Tile = new Tile();
     tile2Tile.letter = "H";
     tile2Tile.points = 4;
-    tile2.tile = tile2Tile;
+    const tile2 = new PlacedTile(4, 1, tile2Tile);
     board1[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
 
     //SECOND TEST: one vertical intersections
@@ -83,22 +77,16 @@ describe("GameCommands", () => {
   describe("BuildVerticalWordsCommand", () => {
     // FIRST TEST : no intersections
     const board1: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
-    const tile1 = new PlacedTile();
-    tile1.row = 5;
-    tile1.column = 4;
     const tile1Tile = new Tile();
     tile1Tile.letter = "A";
     tile1Tile.points = 2;
-    tile1.tile = tile1Tile;
+    const tile1 = new PlacedTile(5, 4, tile1Tile);
     board1[calculatedIndex(tile1.row, tile1.column)] = tile1Tile;
 
-    const tile2 = new PlacedTile();
-    tile2.row = 6;
-    tile2.column = 4;
     const tile2Tile = new Tile();
     tile2Tile.letter = "H";
     tile2Tile.points = 4;
-    tile2.tile = tile2Tile;
+    const tile2 = new PlacedTile(6, 4, tile2Tile);
     board1[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
 
     //SECOND TEST: one vertical intersections
@@ -154,24 +142,19 @@ describe("GameCommands", () => {
 
     // Test One: invalid space
     const board1: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
-    const tile1 = new PlacedTile();
-    tile1.column = 0;
-    tile1.row = 4;
     const tile1Tile = new Tile();
     tile1Tile.letter = "A";
     tile1Tile.points = 2;
-    tile1.tile = tile1Tile;
+    const tile1 = new PlacedTile(4, 0, tile1Tile);
     board1[calculatedIndex(tile1.row, tile1.column)] = tile1Tile;
 
     //Test 2 valid placement
     const board2: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
-    const tile2 = new PlacedTile();
-    tile2.column = 0;
-    tile2.row = 4;
     const tile2Tile = new Tile();
     tile2Tile.letter = "A";
     tile2Tile.points = 2;
-    tile2.tile = tile2Tile;
+
+    const tile2 = new PlacedTile(5, 0, tile2Tile);
     const expectedBoard2 = [...board2];
     expectedBoard2[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
     const expectedPlacedTiles2 = [tile2];
@@ -217,13 +200,11 @@ describe("GameCommands", () => {
 
     //Test One: invalid placement
     const board2: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
-    const tile2 = new PlacedTile();
-    tile2.column = 0;
-    tile2.row = 4;
+
     const tile2Tile = new Tile();
     tile2Tile.letter = "A";
     tile2Tile.points = 2;
-    tile2.tile = tile2Tile;
+    const tile2 = new PlacedTile(4, 0, tile2Tile);
     board2[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
     const expectedBoard2 = [...board2];
     expectedBoard2[calculatedIndex(tile2.row, tile2.column)] = new Tile();
@@ -231,13 +212,10 @@ describe("GameCommands", () => {
 
     // Test Two: valid space
     const board1: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
-    const tile1 = new PlacedTile();
-    tile1.column = 0;
-    tile1.row = 4;
     const tile1Tile = new Tile();
     tile1Tile.letter = "A";
     tile1Tile.points = 2;
-    tile1.tile = tile1Tile;
+    const tile1 = new PlacedTile(4, 0, tile1Tile);
 
     test.each<PlaceTileTestTuple>([
       ["Invalid space", tile1, board1, [], [board1, []]],
