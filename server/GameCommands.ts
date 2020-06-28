@@ -292,6 +292,15 @@ export class AddToPlayerScore extends Command<
   }
 }
 
+/** Checks if it's game over, if it is does the final scoring and state changes */
+export class CheckForGameOver extends Command<WordGameState, {}> {
+  execute() {
+    if (this.state.tileDeck.length === 0) {
+      this.state.gameOver = true;
+    }
+  }
+}
+
 //TODO: add a command to draw tiles, go to the next player, and check if the game is over
 
 /** Helper function to sort the placed tiles */

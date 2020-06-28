@@ -55,6 +55,9 @@ export class WordGameState extends Schema {
   /** Tiles placed by a player */
   @type([PlacedTile])
   placedTiles = new ArraySchema<PlacedTile>();
+
+  @type("boolean")
+  gameOver = false;
 }
 
 export class GameRoom extends Room<WordGameState> {
