@@ -8,14 +8,24 @@ export class Tile extends Schema {
   @type("string")
   letter: string;
   @type("number")
-  points: number = 0;
+  points: number = -1;
+}
+
+/** Represents a tile played by a player on the board */
+export class PlacedTile extends Schema {
+  @type("number")
+  row: number;
+  @type("number")
+  column: number;
+  @type(Tile)
+  tile: Tile;
 }
 
 export class Player extends Schema {
   @type("string")
-  name: String;
+  name: string;
   @type("number")
-  score: Number;
+  score: number = 0;
   // The list of tiles the player can play
   @type([Tile])
   hand = new ArraySchema<Tile>();
@@ -25,13 +35,21 @@ export class WordGameState extends Schema {
   @type({ map: Player })
   players = new MapSchema<Player>();
 
-  //Id of the current player who's turn is it
+  /** Id of the current player who's turn is it */
   @type("string")
   currentTurn: string;
 
-  // List of tiles that can be drawn into players hands
+  /**  List of tiles that can be drawn into players hands */
   @type([Tile])
   tileDeck = new ArraySchema<Tile>();
+
+  /** 1d array that represnts the 2d game board */
+  @type([Tile])
+  gameBoard = new ArraySchema<Tile>();
+
+  /** Tiles placed by a player */
+  @type([PlacedTile])
+  placedTiles = new ArraySchema<PlacedTile>();
 }
 
 export class GameRoom extends Room<WordGameState> {
