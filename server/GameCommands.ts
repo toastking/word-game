@@ -79,6 +79,30 @@ export class CheckWordsCommand extends Command<WordGameState, {}> {
 
 /** Build a word that's mainly horizontal */
 export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
+  validate() {
+    //Check that the horizontal word intersection with other words
+    const hasIntersections = this.state.placedTiles.some((tile) => {
+      return (
+        !isEmptySpace(tile.row + 1, tile.column, this.state.gameBoard) ||
+        !isEmptySpace(tile.row - 1, tile.column, this.state.gameBoard)
+      );
+    });
+
+    const firstTile: PlacedTile = this.state.placedTiles[0];
+    const lastTile: PlacedTile = this.state.placedTiles[
+      this.state.placedTiles.length - 1
+    ];
+    return (
+      !isEmptySpace(
+        firstTile.row,
+        firstTile.column - 1,
+        this.state.gameBoard
+      ) ||
+      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
+      hasIntersections
+    );
+  }
+
   execute() {
     const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
     const words: Tile[][] = [];

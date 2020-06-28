@@ -1,13 +1,11 @@
-import { Room } from "./__mocks__/colyseus";
-import { WordGameState, PlacedTile, Tile, Player } from "./GameRoom";
+import { Dispatcher } from "@colyseus/command";
 import {
   BOARD_SIZE,
   BuildHorizontalWordCommand,
-  AddToPlayerScore,
   calculatedIndex,
 } from "./GameCommands";
-import { Dispatcher } from "@colyseus/command";
-import { RoomInternalState } from "colyseus";
+import { PlacedTile, Player, Tile, WordGameState } from "./GameRoom";
+import { Room } from "./__mocks__/colyseus";
 
 describe("GameCommands", () => {
   let room: Room<WordGameState>;
@@ -58,7 +56,7 @@ describe("GameCommands", () => {
 
     type HorizontalWordsTestTuple = [string, PlacedTile[], Tile[], number];
     const cases: HorizontalWordsTestTuple[] = [
-      ["no intersections", [tile1, tile2], board1, 6],
+      ["no intersections", [tile1, tile2], board1, 0],
       ["top intersection", [tile1, tile2], board2, 20],
       ["top and bottom intersection", [tile1, tile2], board3, 21],
     ];
