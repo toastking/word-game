@@ -122,6 +122,91 @@ export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
         this.state.gameBoard
       ) ||
       !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
+      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
+      hasIntersections
+    );
+  }
+
+  execute() {
+    const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
+    const words: Tile[][] = [];
+    const firstPlacedTile: PlacedTile = sortedPlacedTiles[0];
+
+    let columnCursor = firstPlacedTile.column;
+
+    // Get the row of the horizontal word so we can check for vertical intersections
+    const { row } = firstPlacedTile;
+    //While it's an actual tile decremment the counter
+    while (!isEmptySpace(row, columnCursor - 1, this.state.gameBoard)) {
+      columnCursor--;
+    }
+    const startColumn = columnCursor;
+
+    //Now find the end of the word
+    const lastPlacedTile: PlacedTile =
+      sortedPlacedTiles[sortPlacedTiles.length - 1];
+    columnCursor = lastPlacedTile.column;
+
+    while (!isEmptySpace(row, columnCursor + 1, this.state.gameBoard)) {
+      columnCursor++;
+    }
+    const endColumn = columnCursor;
+
+    for (let column = startColumn; column <= endColumn; column++) {
+      // If the start index is not empty decrement the row as long as we can
+      let innerStartCursor = row;
+      while (
+        !isEmptySpace(innerStartCursor - 1, column, this.state.gameBoard)
+      ) {
+        innerStartCursor--;
+      }
+
+      let innerEndCursor = row;
+      while (!isEmptySpace(innerEndCursor + 1, column, this.state.gameBoard)) {
+        innerEndCursor++;
+      }
+
+      // Check if a word was actually formed, if it was then we append the word list
+      if (innerStartCursor !== innerEndCursor) {
+        const word: Tile[] = [];
+        for (let row = innerStartCursor; row <= innerEndCursor; row++) {
+          word.push(this.state.gameBoard[calculatedIndex(row, column)]);
+        }
+        words.push(word);
+      }
+    }
+
+    // Add the placed word to the list of letters
+    words.push(this.state.placedTiles.map((placedTile) => placedTile.tile));
+
+    // Set off the scoring  action
+    return [new AddToPlayerScore().setPayload({ words })];
+  }
+}
+
+/** Build a word that's mainly vertical */
+export class BuildVerticalWordCommand extends Command<WordGameState, {}> {
+  validate() {
+    //Check that the horizontal word intersection with other words
+    const hasIntersections = this.state.placedTiles.some((tile) => {
+      return (
+        !isEmptySpace(tile.row, tile.column - 1, this.state.gameBoard) ||
+        !isEmptySpace(tile.row, tile.column + 1, this.state.gameBoard)
+      );
+    });
+
+    const firstTile: PlacedTile = this.state.placedTiles[0];
+    const lastTile: PlacedTile = this.state.placedTiles[
+      this.state.placedTiles.length - 1
+    ];
+    return (
+      !isEmptySpace(
+        firstTile.row,
+        firstTile.column - 1,
+        this.state.gameBoard
+      ) ||
+      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
+      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
       hasIntersections
     );
   }
@@ -186,13 +271,6 @@ export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
   }
 }
 
-/** Build a word that's mainly vertical */
-export class BuildVerticalWordCommand extends Command<WordGameState, {}> {
-  execute() {
-    const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
-  }
-}
-
 /** Add a word the current players score */
 export class AddToPlayerScore extends Command<
   WordGameState,
@@ -238,7 +316,7 @@ export function calculatedIndex(row: number, column: number): number {
 
 /** If a space one a board is an empty tile and does not have a tile places there */
 function isEmptySpace(row: number, column: number, board: ArraySchema<Tile>) {
-  if (row < 0 || column < 0) {
+  if (row < 0 || column < 0 || row >= BOARD_SIZE || column >= BOARD_SIZE) {
     return true;
   }
   return board[calculatedIndex(row, column)].points === -1;

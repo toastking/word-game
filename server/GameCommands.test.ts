@@ -135,7 +135,7 @@ describe("GameCommands", () => {
     );
   });
 
-  describe("Remove Tile", () => {
+  describe.skip("Remove Tile", () => {
     type PlaceTileTestExpectedTupe = [Tile[], PlacedTile[]];
     type PlaceTileTestTuple = [
       string,
