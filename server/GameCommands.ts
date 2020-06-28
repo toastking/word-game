@@ -214,49 +214,36 @@ export class BuildVerticalWordCommand extends Command<WordGameState, {}> {
   execute() {
     const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
     const words: Tile[][] = [];
+
+    //Get the start row for the word
     const firstPlacedTile: PlacedTile = sortedPlacedTiles[0];
-
-    let columnCursor = firstPlacedTile.column;
-    //While it's an actual tile decremment the counter
-    while (
-      !isEmptySpace(columnCursor - 1, columnCursor, this.state.gameBoard)
-    ) {
-      columnCursor--;
-    }
-    const startColumn = columnCursor;
-
+    const startRow = firstPlacedTile.row;
     //Now find the end of the word
     const lastPlacedTile: PlacedTile =
       sortedPlacedTiles[sortPlacedTiles.length - 1];
-    columnCursor = lastPlacedTile.column;
+    const endRow = lastPlacedTile.row;
 
-    // Get the row of the horizontal word so we can check for vertical intersections
-    const { row } = firstPlacedTile;
-    while (
-      !isEmptySpace(columnCursor + 1, columnCursor, this.state.gameBoard)
-    ) {
-      columnCursor++;
-    }
-    const endColumn = columnCursor;
-
-    for (let column = startColumn; column <= endColumn; column++) {
+    let column = firstPlacedTile.column;
+    for (let row = startRow; row <= endRow; row++) {
       // If the start index is not empty decrement the row as long as we can
-      let innerStartCursor = row;
-      while (
-        !isEmptySpace(innerStartCursor - 1, column, this.state.gameBoard)
-      ) {
+      let innerStartCursor = column;
+      while (!isEmptySpace(row, innerStartCursor - 1, this.state.gameBoard)) {
         innerStartCursor--;
       }
 
-      let innerEndCursor = row;
-      while (!isEmptySpace(innerEndCursor + 1, column, this.state.gameBoard)) {
+      let innerEndCursor = column;
+      while (!isEmptySpace(row, innerEndCursor + 1, this.state.gameBoard)) {
         innerEndCursor++;
       }
 
       // Check if a word was actually formed, if it was then we append the word list
       if (innerStartCursor !== innerEndCursor) {
         const word: Tile[] = [];
-        for (let row = innerStartCursor; row <= innerEndCursor; row++) {
+        for (
+          let column = innerStartCursor;
+          column <= innerEndCursor;
+          column++
+        ) {
           word.push(this.state.gameBoard[calculatedIndex(row, column)]);
         }
         words.push(word);
