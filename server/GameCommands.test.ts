@@ -4,6 +4,7 @@ import {
   BuildHorizontalWordCommand,
   calculatedIndex,
   PlaceTileCommand,
+  RemoveTileCommand,
 } from "./GameCommands";
 import { PlacedTile, Player, Tile, WordGameState } from "./GameRoom";
 import { Room } from "./__mocks__/colyseus";
@@ -127,6 +128,73 @@ describe("GameCommands", () => {
         const dispatcher = new Dispatcher(room);
 
         dispatcher.dispatch(new PlaceTileCommand(), { tile: placedTile });
+
+        expect(room.state.gameBoard).toEqual(expectedBoard);
+        expect(room.state.placedTiles).toEqual(expectedPlacedTiles);
+      }
+    );
+  });
+
+  describe("Remove Tile", () => {
+    type PlaceTileTestExpectedTupe = [Tile[], PlacedTile[]];
+    type PlaceTileTestTuple = [
+      string,
+      PlacedTile,
+      Tile[],
+      PlacedTile[],
+      PlaceTileTestExpectedTupe
+    ];
+
+    //Test One: invalid placement
+    const board2: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
+    const tile2 = new PlacedTile();
+    tile2.column = 0;
+    tile2.row = 4;
+    const tile2Tile = new Tile();
+    tile2Tile.letter = "A";
+    tile2Tile.points = 2;
+    tile2.tile = tile2Tile;
+    board2[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
+    const expectedBoard2 = [...board2];
+    expectedBoard2[calculatedIndex(tile2.row, tile2.column)] = new Tile();
+    const expectedPlacedTiles2: PlacedTile[] = [];
+
+    // Test Two: valid space
+    const board1: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
+    const tile1 = new PlacedTile();
+    tile1.column = 0;
+    tile1.row = 4;
+    const tile1Tile = new Tile();
+    tile1Tile.letter = "A";
+    tile1Tile.points = 2;
+    tile1.tile = tile1Tile;
+
+    test.each<PlaceTileTestTuple>([
+      ["Invalid space", tile1, board1, [], [board1, []]],
+      [
+        "Valid space",
+        tile2,
+        board2,
+        [tile2],
+        [expectedBoard2, expectedPlacedTiles2],
+      ],
+    ])(
+      "%s",
+      (
+        _,
+        placedTile,
+        gameBoard,
+        placedTiles,
+        [expectedBoard, expectedPlacedTiles]
+      ) => {
+        room.state.gameBoard.push(...gameBoard);
+        placedTiles.forEach((tile) => {
+          room.state.placedTiles.push(tile);
+        });
+
+        const dispatcher = new Dispatcher(room);
+
+        dispatcher.dispatch(new RemoveTileCommand(), { tile: placedTile });
 
         expect(room.state.gameBoard).toEqual(expectedBoard);
         expect(room.state.placedTiles).toEqual(expectedPlacedTiles);

@@ -38,15 +38,29 @@ export class PlaceTileCommand extends Command<
 /** Command to remove a tile */
 export class RemoveTileCommand extends Command<
   WordGameState,
-  { row: number; column: number }
+  { tile: PlacedTile }
 > {
-  execute({ row, column }: this["payload"]) {
-    const indexToRemove = this.state.placedTiles.findIndex(
-      (placedTile) => placedTile.row === row && placedTile.column === column
+  validate({ tile }: this["payload"]) {
+    // Check that it's actually in the list of placed tiles
+    return this.state.placedTiles.some(
+      (placedTile) =>
+        placedTile.row === tile.row && placedTile.column === tile.column
     );
-    // If it found the value
+  }
+
+  execute({ tile }: this["payload"]) {
+    const indexToRemove = this.state.placedTiles.findIndex(
+      (placedTile) =>
+        placedTile.row === tile.row && placedTile.column === tile.column
+    );
+    // If it found the value remove it from both the tile list and the game board
     if (indexToRemove >= 0) {
       this.state.placedTiles.splice(indexToRemove, 1);
+      this.state.gameBoard.splice(
+        calculatedIndex(tile.row, tile.column),
+        1,
+        new Tile()
+      );
     }
   }
 }

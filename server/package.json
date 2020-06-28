@@ -33,6 +33,7 @@
   "dependencies": {
     "@colyseus/command": "^0.1.5",
     "@colyseus/monitor": "^0.12.2",
+    "@colyseus/schema": "^0.5.39",
     "@colyseus/social": "^0.10.9",
     "@types/jest": "^26.0.3",
     "colyseus": "^0.13.7",
