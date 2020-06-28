@@ -277,7 +277,7 @@ export class AddToPlayerScore extends Command<
   }
 }
 
-//TODO: add a command to go the next player and check if the game is over
+//TODO: add a command to draw tiles, go to the next player, and check if the game is over
 
 /** Helper function to sort the placed tiles */
 function sortPlacedTiles(tileA: PlacedTile, tileB: PlacedTile) {

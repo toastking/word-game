@@ -11,3 +11,12 @@ export class OnJoinCommand extends Command<
     this.state.players[sessionId] = newPlayer;
   }
 }
+
+export class OnLeaveCommand extends Command<
+  WordGameState,
+  { sessionId: string }
+> {
+  execute({ sessionId }: this["payload"]) {
+    delete this.state.players[sessionId];
+  }
+}
