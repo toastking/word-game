@@ -6,6 +6,7 @@ import {
   OnLeaveCommand,
   NextPlayerCommand,
 } from "./PlayerCommands";
+import { CreateDeckCommand } from "./TileCommands";
 
 describe("PlayerCommands", () => {
   let room: Room<WordGameState>;
@@ -14,13 +15,15 @@ describe("PlayerCommands", () => {
     room.setState(new WordGameState());
   });
 
-  test("OnJoinCommand adds player", () => {
+  test("OnJoinCommand adds player and populates hand", () => {
     const dispatcher = new Dispatcher(room);
     dispatcher.dispatch(new OnJoinCommand(), { sessionId: "id", name: "Name" });
 
     const expectedPlayer = new Player();
     expectedPlayer.name = "Name";
-    expect(room.state.players).toEqual({ id: expectedPlayer });
+    expect(room.state.players["id"]).toEqual(
+      expect.objectContaining(expectedPlayer)
+    );
   });
 
   test("OnLeaveCommand removes player", () => {

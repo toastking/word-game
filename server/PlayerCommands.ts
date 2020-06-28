@@ -1,5 +1,6 @@
 import { Command } from "@colyseus/command";
 import { WordGameState, Player } from "./GameRoom";
+import { DrawTilesCommand } from "./TileCommands";
 
 export class OnJoinCommand extends Command<
   WordGameState,
@@ -8,6 +9,8 @@ export class OnJoinCommand extends Command<
   execute({ sessionId, name }: this["payload"]) {
     const newPlayer = new Player(name);
     this.state.players[sessionId] = newPlayer;
+    // populate the player hand
+    return [new DrawTilesCommand().setPayload({ sessionId })];
   }
 }
 

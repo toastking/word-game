@@ -30,7 +30,7 @@ export class Player extends Schema {
   @type([Tile])
   hand = new ArraySchema<Tile>();
 
-  constructor(name?: string, id?: string) {
+  constructor(name?: string) {
     super();
     this.name = name;
   }
