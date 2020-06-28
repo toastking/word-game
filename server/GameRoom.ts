@@ -1,7 +1,7 @@
 import { Room, Client } from "colyseus";
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 import { Dispatcher } from "@colyseus/command";
-import { OnJoinCommand } from "./PlayerCommands";
+import { OnJoinCommand, OnLeaveCommand } from "./PlayerCommands";
 import { CreateDeckCommand } from "./TileCommands";
 import { OnCreateCommand } from "./GameCommands";
 
@@ -87,7 +87,11 @@ export class GameRoom extends Room<WordGameState> {
     });
   }
 
-  onLeave(client: Client, consented: boolean) {}
+  onLeave(client: Client, consented: boolean) {
+    this.dispatcher.dispatch(new OnLeaveCommand(), {
+      sessionId: client.sessionId,
+    });
+  }
 
   onDispose() {
     this.dispatcher.stop();
