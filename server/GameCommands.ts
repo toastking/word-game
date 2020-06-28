@@ -1,6 +1,8 @@
 import { Command } from "@colyseus/command";
 import { PlacedTile, Tile, WordGameState, Player } from "./GameRoom";
 import { ArraySchema } from "@colyseus/schema";
+import { DrawTilesCommand } from "./TileCommands";
+import { NextPlayerCommand } from "./PlayerCommands";
 
 // Game board is 15x15 squares
 export const BOARD_SIZE = 15;
@@ -281,6 +283,12 @@ export class AddToPlayerScore extends Command<
     const player: Player = this.state.players[this.state.currentTurn];
     (this.state.players[this.state.currentTurn] as Player).score =
       player.score + wordScore;
+
+    // Kick off the next actions for the turn
+    return [
+      (new DrawTilesCommand().setPayload({ sessionId: this.state.currentTurn }),
+      new NextPlayerCommand()),
+    ];
   }
 }
 
