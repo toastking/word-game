@@ -1,11 +1,18 @@
 import { Command } from "@colyseus/command";
 import { PlacedTile, Tile, WordGameState, Player } from "./GameRoom";
 import { ArraySchema } from "@colyseus/schema";
-import { DrawTilesCommand } from "./TileCommands";
+import { DrawTilesCommand, CreateDeckCommand } from "./TileCommands";
 import { NextPlayerCommand } from "./PlayerCommands";
 
 // Game board is 15x15 squares
 export const BOARD_SIZE = 15;
+
+/** Runs the commands to initialize the game */
+export class OnCreateCommand extends Command<WordGameState, {}> {
+  execute() {
+    return [new InitializeGameBoardCommand(), new CreateDeckCommand()];
+  }
+}
 
 /** Command to set up the game board */
 export class InitializeGameBoardCommand extends Command<WordGameState, {}> {

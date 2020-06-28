@@ -2,6 +2,8 @@ import { Room, Client } from "colyseus";
 import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 import { Dispatcher } from "@colyseus/command";
 import { OnJoinCommand } from "./PlayerCommands";
+import { CreateDeckCommand } from "./TileCommands";
+import { OnCreateCommand } from "./GameCommands";
 
 /** Repressents a game tile */
 export class Tile extends Schema {
@@ -68,6 +70,9 @@ export class GameRoom extends Room<WordGameState> {
     this.maxClients = 4;
     //Set the intial State
     this.setState(new WordGameState());
+
+    //Initialize the board and deck
+    this.dispatcher.dispatch(new OnCreateCommand());
 
     this.onMessage("type", (client, message) => {
       // handle "type" message

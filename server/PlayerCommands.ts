@@ -9,6 +9,10 @@ export class OnJoinCommand extends Command<
   execute({ sessionId, name }: this["payload"]) {
     const newPlayer = new Player(name);
     this.state.players[sessionId] = newPlayer;
+    // If there's no current player set the player to current player
+    if (!this.state.currentTurn) {
+      this.state.currentTurn = sessionId;
+    }
     // populate the player hand
     return [new DrawTilesCommand().setPayload({ sessionId })];
   }

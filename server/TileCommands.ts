@@ -38,8 +38,6 @@ const letters: LetterMapping[] = [
   { letter: "", points: 0, occurences: 2 },
 ];
 
-const MAX_TILES_IN_HAND = 7;
-
 /** Command to create the deck of tiles at the start of the game */
 export class CreateDeckCommand extends Command<WordGameState, {}> {
   execute() {
