@@ -31,11 +31,10 @@
     </div>
     <div class="player-1-area">
       <!-- User Player (Player 1) -->
-      <player-card
-        v-if="userPlayer !== null"
-        :player="userPlayer"
-        :playerId="sessionId"
-      ></player-card>
+      <template v-if="userPlayer !== null">
+        <game-tiles :tiles="userPlayer.hand"></game-tiles>
+        <player-card :player="userPlayer" :playerId="sessionId"></player-card>
+      </template>
     </div>
   </div>
 </template>
@@ -45,6 +44,8 @@ import Vue from 'vue';
 import PlayerCard from '../components/PlayerCard.vue';
 import { Player } from '../schema/Player';
 import { colyseusService } from '../main';
+import GameTiles from '../components/GameTiles.vue';
+
 export default Vue.extend({
   data() {
     const players: { [id: string]: Player } = {};
@@ -92,6 +93,7 @@ export default Vue.extend({
   },
   components: {
     PlayerCard,
+    GameTiles,
   },
 });
 </script>
