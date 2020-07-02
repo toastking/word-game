@@ -31,4 +31,6 @@ export class Room<T = any> {
       this.clients.splice(index, 1);
     }
   }
+
+  lock() {}
 }

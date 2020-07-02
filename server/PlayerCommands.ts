@@ -1,5 +1,5 @@
 import { Command } from "@colyseus/command";
-import { WordGameState, Player } from "./GameRoom";
+import { Player, WordGameState } from "./GameRoom";
 import { DrawTilesCommand } from "./TileCommands";
 
 export class OnJoinCommand extends Command<
@@ -9,10 +9,6 @@ export class OnJoinCommand extends Command<
   execute({ sessionId, name }: this["payload"]) {
     const newPlayer = new Player(name);
     this.state.players[sessionId] = newPlayer;
-    // If there's no current player set the player to current player
-    if (!this.state.currentTurn) {
-      this.state.currentTurn = sessionId;
-    }
     // populate the player hand
     return [new DrawTilesCommand().setPayload({ sessionId })];
   }
@@ -34,5 +30,12 @@ export class NextPlayerCommand extends Command<WordGameState, {}> {
     const currentIdx = ids.findIndex((id) => id === this.state.currentTurn);
     const nextIdx = (currentIdx + 1) % ids.length;
     this.state.currentTurn = ids[nextIdx];
+  }
+}
+
+/** Command to set the current turn when someone starts the game */
+export class SetStartPlayerCommand extends Command<WordGameState, {}> {
+  execute() {
+    this.state.currentTurn = Object.keys(this.state.players)[0];
   }
 }

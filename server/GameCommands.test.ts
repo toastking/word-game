@@ -6,6 +6,7 @@ import {
   PlaceTileCommand,
   RemoveTileCommand,
   BuildVerticalWordCommand,
+  OnGameStartCommand,
 } from "./GameCommands";
 import { PlacedTile, Player, Tile, WordGameState } from "./GameRoom";
 import { Room } from "./mock/colyseus";
@@ -255,5 +256,18 @@ describe("GameCommands", () => {
         expect(room.state.placedTiles).toEqual(expectedPlacedTiles);
       }
     );
+  });
+
+  describe("OnGameStartedCommand", () => {
+    test("sets up the game properly and locks the room when the game starts", () => {
+      room.state.players["id"] = new Player("mort");
+      const mockLockFn = jest.spyOn(room, "lock");
+
+      const dispatcher = new Dispatcher(room);
+      dispatcher.dispatch(new OnGameStartCommand());
+
+      expect(room.state.currentTurn).toBe("id");
+      expect(mockLockFn).toHaveBeenCalled();
+    });
   });
 });

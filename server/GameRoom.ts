@@ -7,6 +7,7 @@ import {
   OnCreateCommand,
   PlaceTileCommand,
   RemoveTileCommand,
+  OnGameStartCommand,
 } from "./GameCommands";
 import { number } from "@colyseus/schema/lib/encoding/decode";
 
@@ -87,8 +88,8 @@ export class GameRoom extends Room<WordGameState> {
     //Initialize the board and deck
     this.dispatcher.dispatch(new OnCreateCommand());
 
-    this.onMessage("type", (client, message) => {
-      // handle "type" message
+    this.onMessage("startGame", () => {
+      this.dispatcher.dispatch(new OnGameStartCommand());
     });
 
     this.onMessage(
