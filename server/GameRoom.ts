@@ -126,7 +126,7 @@ export class GameRoom extends Room<WordGameState> {
     console.log("joined");
     this.dispatcher.dispatch(new OnJoinCommand(), {
       sessionId: client.sessionId,
-      name: options?.name,
+      name: options?.playerName,
     });
   }
 
