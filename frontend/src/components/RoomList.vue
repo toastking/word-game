@@ -10,7 +10,7 @@
 </template>
 <script lang="ts">
 import Vue from 'vue';
-import { client } from '../main';
+import { colyseusService } from '../main';
 import { RoomAvailable } from 'colyseus.js';
 export default Vue.extend({
   data() {
@@ -18,7 +18,7 @@ export default Vue.extend({
     return { rooms };
   },
   async created() {
-    const lobby = await client.joinOrCreate('lobby');
+    const lobby = await colyseusService.getLobby();
 
     lobby.onMessage('rooms', rooms => {
       console.log(rooms);

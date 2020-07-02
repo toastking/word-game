@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { client } from '../main';
+import { colyseusService } from '../main';
 export default Vue.extend({
   data() {
     return { playerName: '', isLoading: false };
@@ -25,7 +25,12 @@ export default Vue.extend({
   methods: {
     async createGame() {
       this.isLoading = true;
-      await client.create('game', { playerName: this.playerName });
+      await colyseusService.createGame(this.playerName);
+      const roomId = colyseusService.room?.id;
+      if (roomId) {
+        this.$router.push({ name: 'Game', params: { roomId } });
+      }
+      //TODO: handle failed room creation
 
       this.isLoading = false;
     },
