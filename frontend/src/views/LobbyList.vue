@@ -9,6 +9,6 @@
 import Vue from "vue";
 import RoomList from "../components/RoomList.vue";
 export default Vue.extend({
-  components: { RoomList },
+  components: { RoomList }
 });
 </script>

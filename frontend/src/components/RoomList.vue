@@ -20,13 +20,13 @@ export default Vue.extend({
   async created() {
     const lobby = await client.joinOrCreate("lobby");
 
-    lobby.onMessage("rooms", (rooms) => {
+    lobby.onMessage("rooms", rooms => {
       console.log(rooms);
       this.rooms = rooms;
     });
 
     lobby.onMessage("+", ([roomId, room]) => {
-      const roomIndex = this.rooms.findIndex((room) => room.roomId === roomId);
+      const roomIndex = this.rooms.findIndex(room => room.roomId === roomId);
       if (roomIndex !== -1) {
         this.rooms.splice(roomIndex, 1, room);
       } else {
@@ -34,9 +34,9 @@ export default Vue.extend({
       }
     });
 
-    lobby.onMessage("-", (roomId) => {
-      this.rooms = this.rooms.filter((room) => room.roomId !== roomId);
+    lobby.onMessage("-", roomId => {
+      this.rooms = this.rooms.filter(room => room.roomId !== roomId);
     });
-  },
+  }
 });
 </script>

@@ -11,7 +11,7 @@ Vue.use(Buefy);
 
 new Vue({
   router,
-  render: (h) => h(App),
+  render: h => h(App)
 }).$mount("#app");
 
 // Initialize the game client

@@ -22,7 +22,7 @@ export default Vue.extend({
   methods: {
     createGame() {
       client.create("game", { playerName: this.playerName });
-    },
-  },
+    }
+  }
 });
 </script>
