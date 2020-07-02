@@ -11,7 +11,14 @@ export class ColyseusService {
     return this.client.joinOrCreate('lobby');
   }
 
+  /** Create a game and player with the given player name */
   async createGame(playerName: string) {
     this.room = await this.client.create('game', { playerName: playerName });
+  }
+
+  /** Join an in progress game and create a player */
+  async joinGame(roomId: string, playerName: string) {
+    this.room = await this.client.joinById(roomId, { playerName });
+    return this.room.id;
   }
 }
