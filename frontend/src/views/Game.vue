@@ -101,8 +101,10 @@ export default Vue.extend({
 <style scoped>
 .game-grid {
   display: grid;
-  grid-template-areas: '. . player-3 . .',
-    'player-2 game-board  game-board game-board player-4', '. . player-1 . .';
+  grid-template-areas:
+    '. . player-3 . .'
+    'player-2 game-board  game-board game-board player-4'
+    '. . player-1 . .';
 }
 
 .player-3-area {

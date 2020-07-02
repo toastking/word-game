@@ -11,7 +11,7 @@ import GameTile from './GameTile.vue';
 export default Vue.extend({
   props: {
     tiles: {
-      type: Object as PropType<Array<Tile>>,
+      type: Array as PropType<Array<Tile>>,
       required: true,
     },
   },
