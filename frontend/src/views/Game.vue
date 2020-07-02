@@ -1,47 +1,41 @@
 <template>
-  <div class="container">
-    <div class="tile is-ancestor">
-      <div class="tile is-parent is-vertical">
-        <div class="tile is-child">
-          <!-- Player 3 -->
-          <player-card
-            v-if="playerCount > 2"
-            :player="players[nonUserPlayersIds[1]]"
-            :playerId="nonUserPlayersIds[1]"
-            :currentTurn="currentTurn"
-          ></player-card>
-        </div>
-        <div class="tile is-child is-10">
-          <!-- Game board and player areas-->
-          <div class="tile is-3">
-            <!-- Player 2 -->
-            <player-card
-              v-if="playerCount > 1"
-              :player="players[nonUserPlayersIds[0]]"
-              :playerId="nonUserPlayersIds[0]"
-              :currentTurn="currentTurn"
-            ></player-card>
-          </div>
-          <div class="tile game-board"></div>
-          <div class="tile is-3">
-            <!-- Player 4 -->
-            <player-card
-              v-if="playerCount > 3"
-              :player="players[nonUserPlayersIds[2]]"
-              :playerId="nonUserPlayersIds[2]"
-              :currentTurn="currentTurn"
-            ></player-card>
-          </div>
-        </div>
-        <div class="tile is-child">
-          <!-- User Player (Player 1) -->
-          <player-card
-            v-if="userPlayer !== null"
-            :player="userPlayer"
-            :playerId="sessionId"
-          ></player-card>
-        </div>
-      </div>
+  <div class="container game-grid">
+    <div class="player-3-area">
+      <!-- Player 3 -->
+      <player-card
+        v-if="playerCount > 2"
+        :player="players[nonUserPlayersIds[1]]"
+        :playerId="nonUserPlayersIds[1]"
+        :currentTurn="currentTurn"
+      ></player-card>
+    </div>
+    <!-- Game board and player areas-->
+    <div class="player-2-area">
+      <!-- Player 2 -->
+      <player-card
+        v-if="playerCount > 1"
+        :player="players[nonUserPlayersIds[0]]"
+        :playerId="nonUserPlayersIds[0]"
+        :currentTurn="currentTurn"
+      ></player-card>
+    </div>
+    <div class="game-board"></div>
+    <div class="player-4-area">
+      <!-- Player 4 -->
+      <player-card
+        v-if="playerCount > 3"
+        :player="players[nonUserPlayersIds[2]]"
+        :playerId="nonUserPlayersIds[2]"
+        :currentTurn="currentTurn"
+      ></player-card>
+    </div>
+    <div class="player-1-area">
+      <!-- User Player (Player 1) -->
+      <player-card
+        v-if="userPlayer !== null"
+        :player="userPlayer"
+        :playerId="sessionId"
+      ></player-card>
     </div>
   </div>
 </template>
@@ -101,3 +95,31 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style scoped>
+.game-grid {
+  display: grid;
+  grid-template-areas: '. . player-3 . .',
+    'player-2 game-board  game-board game-board player-4', '. . player-1 . .';
+}
+
+.player-3-area {
+  grid-area: player-3;
+}
+
+.player-2-area {
+  grid-area: player-2;
+}
+
+.player-4-area {
+  grid-area: player-4;
+}
+
+.player-1-area {
+  grid-area: player-1;
+}
+
+.game-board {
+  grid-area: game-board;
+}
+</style>
