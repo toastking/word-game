@@ -70,7 +70,7 @@ export class DrawTilesCommand extends Command<
     for (let i = 0; i < toDraw; i++) {
       const randomIdx = Math.floor(Math.random() * this.state.tileDeck.length);
       const drawnTile = this.state.tileDeck.splice(randomIdx, 1);
-      (this.state.players[sessionId] as Player).hand.push(drawnTile);
+      (this.state.players[sessionId] as Player).hand.push(drawnTile[0]);
     }
   }
 }

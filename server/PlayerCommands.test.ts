@@ -17,13 +17,13 @@ describe("PlayerCommands", () => {
 
   test("OnJoinCommand adds player and populates hand", () => {
     const dispatcher = new Dispatcher(room);
+    dispatcher.dispatch(new CreateDeckCommand());
     dispatcher.dispatch(new OnJoinCommand(), { sessionId: "id", name: "Name" });
 
-    const expectedPlayer = new Player();
-    expectedPlayer.name = "Name";
-    expect(room.state.players["id"]).toEqual(
-      expect.objectContaining(expectedPlayer)
-    );
+    const updatedPlayer: Player = room.state.players["id"];
+    expect(updatedPlayer.name).toBe("Name");
+    expect(updatedPlayer.score).toBe(0);
+    expect(updatedPlayer.hand.length).toBe(7);
   });
 
   test("OnLeaveCommand removes player", () => {
