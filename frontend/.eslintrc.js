@@ -22,5 +22,7 @@ module.exports = {
     "@vue/prettier",
     "@vue/prettier/@typescript-eslint",
     "@vue/typescript",
+    "prettier",
+    "prettier/vue",
   ],
 };
