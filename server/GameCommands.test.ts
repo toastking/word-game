@@ -268,6 +268,7 @@ describe("GameCommands", () => {
 
       expect(room.state.currentTurn).toBe("id");
       expect(mockLockFn).toHaveBeenCalled();
+      expect(room.state.gameStarted).toBe(true);
     });
   });
 });

@@ -18,6 +18,7 @@ export class OnCreateCommand extends Command<WordGameState, {}> {
 export class OnGameStartCommand extends Command<WordGameState, {}> {
   execute() {
     this.room.lock();
+    this.state.gameStarted = true;
     return [new SetStartPlayerCommand()];
   }
 }
