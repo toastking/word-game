@@ -7,22 +7,22 @@ module.exports = {
 
   parserOptions: {
     ecmaVersion: 2020,
-    parser: "@typescript-eslint/parser",
+    parser: '@typescript-eslint/parser',
   },
 
   rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
   },
 
   extends: [
-    "plugin:vue/essential",
-    "eslint:recommended",
-    "@vue/typescript/recommended",
-    "@vue/prettier",
-    "@vue/prettier/@typescript-eslint",
-    "@vue/typescript",
-    "prettier",
-    "prettier/vue",
+    'plugin:vue/essential',
+    'eslint:recommended',
+    '@vue/typescript/recommended',
+    '@vue/prettier',
+    '@vue/prettier/@typescript-eslint',
+    '@vue/typescript',
+    'prettier',
+    'prettier/vue',
   ],
 };

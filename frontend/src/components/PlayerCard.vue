@@ -1,12 +1,18 @@
 <template>
   <div class="box">
     <p>{{ player.name }}</p>
+    <b-icon
+      v-if="isYourTurn"
+      pack="fas"
+      icon="crown"
+      type="is-warning"
+    ></b-icon>
     <p>{{ player.score }}</p>
   </div>
 </template>
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { Player } from "@/schema/Player";
+import Vue, { PropType } from 'vue';
+import { Player } from '@/schema/Player';
 export default Vue.extend({
   props: {
     player: {

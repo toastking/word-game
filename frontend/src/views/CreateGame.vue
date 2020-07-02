@@ -16,16 +16,16 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { client } from "../main";
+import Vue from 'vue';
+import { client } from '../main';
 export default Vue.extend({
   data() {
-    return { playerName: "", isLoading: false };
+    return { playerName: '', isLoading: false };
   },
   methods: {
     async createGame() {
       this.isLoading = true;
-      await client.create("game", { playerName: this.playerName });
+      await client.create('game', { playerName: this.playerName });
 
       this.isLoading = false;
     },

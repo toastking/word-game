@@ -9,23 +9,23 @@
   </div>
 </template>
 <script lang="ts">
-import Vue from "vue";
-import { client } from "../main";
-import { RoomAvailable } from "colyseus.js";
+import Vue from 'vue';
+import { client } from '../main';
+import { RoomAvailable } from 'colyseus.js';
 export default Vue.extend({
   data() {
     const rooms: RoomAvailable<{}>[] = [];
     return { rooms };
   },
   async created() {
-    const lobby = await client.joinOrCreate("lobby");
+    const lobby = await client.joinOrCreate('lobby');
 
-    lobby.onMessage("rooms", rooms => {
+    lobby.onMessage('rooms', rooms => {
       console.log(rooms);
       this.rooms = rooms;
     });
 
-    lobby.onMessage("+", ([roomId, room]) => {
+    lobby.onMessage('+', ([roomId, room]) => {
       const roomIndex = this.rooms.findIndex(room => room.roomId === roomId);
       if (roomIndex !== -1) {
         this.rooms.splice(roomIndex, 1, room);
@@ -34,9 +34,9 @@ export default Vue.extend({
       }
     });
 
-    lobby.onMessage("-", roomId => {
+    lobby.onMessage('-', roomId => {
       this.rooms = this.rooms.filter(room => room.roomId !== roomId);
     });
-  }
+  },
 });
 </script>
