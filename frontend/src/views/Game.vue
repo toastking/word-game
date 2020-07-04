@@ -85,6 +85,20 @@ export default Vue.extend({
         });
       };
 
+      // Set the initial value for the game board
+      this.$store.commit('setGameBoard', room.state.gameBoard);
+
+      //Setup Handler for the game board
+      room.state.gameBoard.onAdd = (tile, idx) => {
+        this.$store.commit('updateTile', { idx, tile });
+      };
+      room.state.gameBoard.onRemove = (_, idx) => {
+        this.$store.commit('removeTile', idx);
+      };
+      room.state.gameBoard.onChange = (tile, idx) => {
+        this.$store.commit('updateTile', { idx, tile });
+      };
+
       this.sessionId = room.sessionId;
     }
   },
