@@ -7,6 +7,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import { ColyseusService } from './ColyseusService';
+import store from './store';
 
 // Initialize the game client
 // NOTE: this must come before initializing the Vue Instance
@@ -24,5 +25,6 @@ Vue.use(Buefy, {
 
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app');
