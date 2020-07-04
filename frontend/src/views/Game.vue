@@ -19,7 +19,9 @@
         :currentTurn="currentTurn"
       ></player-card>
     </div>
-    <div class="game-board"></div>
+    <div class="game-board-area">
+      <game-board></game-board>
+    </div>
     <div class="player-4-area">
       <!-- Player 4 -->
       <player-card
@@ -52,6 +54,7 @@ import GameTiles from '../components/GameTiles.vue';
 import GameButtons from '../components/GameButtons.vue';
 import { mapState, mapMutations } from 'vuex';
 import { GameState } from '../store';
+import GameBoard from '@/components/GameBoard.vue';
 
 export default Vue.extend({
   data() {
@@ -132,6 +135,7 @@ export default Vue.extend({
     PlayerCard,
     GameTiles,
     GameButtons,
+    GameBoard,
   },
 });
 </script>
@@ -143,6 +147,9 @@ export default Vue.extend({
     '. . player-3 . .'
     'player-2 game-board  game-board game-board player-4'
     '. . player-1 . .';
+  grid-template-columns: repeat(5, 1fr);
+  row-gap: 10px;
+  column-gap: 10px;
 }
 
 .player-3-area {
@@ -161,7 +168,7 @@ export default Vue.extend({
   grid-area: player-1;
 }
 
-.game-board {
+.game-board-area {
   grid-area: game-board;
 }
 </style>
