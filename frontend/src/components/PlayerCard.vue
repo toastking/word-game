@@ -1,30 +1,33 @@
 <template>
   <div class="box">
-    <p>{{ player.name }}</p>
-    <b-icon
-      v-if="isYourTurn"
-      pack="fas"
-      icon="crown"
-      type="is-warning"
-    ></b-icon>
-    <p>{{ player.score }}</p>
+    <p>
+      <span class="is-size-5 has-text-weight-semibold">Name: </span>
+      <span class="is-family-secondary">{{ player.name }} </span>
+      <b-tooltip v-if="isYourTurn === true" label="Your Turn!">
+        <b-icon pack="fas" icon="crown" type="is-warning"></b-icon>
+      </b-tooltip>
+    </p>
+    <p>
+      <span class="is-size-5 has-text-weight-semibold">Score: </span>
+      <span class="is-family-secondary">{{ player.score }}</span>
+    </p>
   </div>
 </template>
 <script lang="ts">
 import Vue, { PropType } from 'vue';
 import { Player } from '@/schema/Player';
+import { mapState } from 'vuex';
 export default Vue.extend({
   props: {
     player: {
       type: Object as PropType<Player>,
     },
     playerId: String,
-    /** Id of the current player who's turn it is */
-    curentTurn: { type: String },
   },
   computed: {
+    ...mapState({ currentTurn: 'currentTurn' }),
     isYourTurn() {
-      return this.playerId === this.curentTurn;
+      return this.playerId === this.currentTurn;
     },
   },
 });

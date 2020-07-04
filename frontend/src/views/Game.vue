@@ -99,6 +99,14 @@ export default Vue.extend({
         this.$store.commit('updateTile', { idx, tile });
       };
 
+      // Set the player hand and setup handlers
+
+      room.state.players.onChange = (player, key) => {
+        if (key === room.sessionId) {
+          this.$store.commit('setHand', player.hand);
+        }
+      };
+
       this.sessionId = room.sessionId;
     }
   },

@@ -5,15 +5,12 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from 'vue';
-import { Tile } from '../schema/Tile';
+import Vue from 'vue';
 import GameTile from './GameTile.vue';
+import { mapState } from 'vuex';
 export default Vue.extend({
-  props: {
-    tiles: {
-      type: Array as PropType<Array<Tile>>,
-      required: true,
-    },
+  computed: {
+    ...mapState({ tiles: 'playerHand' }),
   },
   components: {
     GameTile,

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { Tile } from '@/schema/Tile';
+import VueRouter from 'vue-router';
 
 Vue.use(Vuex);
 
@@ -14,23 +15,26 @@ function calculateIndex(row: number, column: number): number {
 
 /** State for the game frontend */
 export interface GameState {
-  currenTurn: string;
+  currentTurn: string;
   gameStarted: boolean;
   gameBoard: Tile[];
+  /** The tiles in players hand */
+  playerHand: Tile[];
 }
 
 export default new Vuex.Store<GameState>({
   state: {
-    currenTurn: '',
+    currentTurn: '',
     gameStarted: false,
     gameBoard: [],
+    playerHand: [],
   },
   mutations: {
     updateGameStarted(state, newVal: boolean) {
       state.gameStarted = newVal;
     },
     updateCurrentTurn(state, turn: string) {
-      state.currenTurn = turn;
+      state.currentTurn = turn;
     },
     setGameBoard(state, board: Tile[]) {
       Vue.set(state, 'gameBoard', [...board]);
@@ -40,6 +44,15 @@ export default new Vuex.Store<GameState>({
     },
     removeTile(state, idx) {
       Vue.delete(state.gameBoard, idx);
+    },
+    setHand(state, hand: Tile[]) {
+      Vue.set(state, 'playerHand', [...hand]);
+    },
+    removeTileFromHand(state, idx) {
+      Vue.delete(state.playerHand, idx);
+    },
+    addTileToHand(state, { idx, tile }: { idx: number; tile: Tile }) {
+      Vue.set(state.playerHand, idx, tile);
     },
   },
   getters: {
