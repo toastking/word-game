@@ -1,6 +1,12 @@
 <template>
   <div class="box tiles">
-    <game-tile v-for="(tile, idx) in tiles" :key="idx" :tile="tile"></game-tile>
+    <game-tile
+      class="tile-in-hand"
+      v-for="(tile, idx) in tiles"
+      :key="idx"
+      :idx="idx"
+      :tile="tile"
+    ></game-tile>
   </div>
 </template>
 
@@ -23,5 +29,12 @@ export default Vue.extend({
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+}
+
+.tiles .tile-in-hand {
+  cursor: pointer;
+}
+.tiles .tile-in-hand:hover {
+  background: hsl(206, 70%, 96%);
 }
 </style>

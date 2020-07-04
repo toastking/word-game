@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="grid-space">
     <div
-      id="empty-grid-space"
       v-if="isEmpty === true"
-      :class="gridItemClass + ' box'"
+      class="empty-grid-item box"
+      :class="gridItemClass"
     ></div>
     <game-tile v-else :tile="tile"></game-tile>
   </div>
@@ -39,8 +39,13 @@ export default Vue.extend({
 });
 </script>
 <style scoped>
-#empty-grid-space {
-  height: 1.5rem;
-  width: 1.5rem;
+.empty-grid-item {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.empty-grid-item:hover {
+  background: hsl(206, 70%, 96%);
 }
 </style>
