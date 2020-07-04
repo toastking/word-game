@@ -8,6 +8,7 @@ import {
   PlaceTileCommand,
   RemoveTileCommand,
   OnGameStartCommand,
+  CheckWordsCommand,
 } from "./GameCommands";
 import { number } from "@colyseus/schema/lib/encoding/decode";
 
@@ -92,6 +93,7 @@ export class GameRoom extends Room<WordGameState> {
     this.dispatcher.dispatch(new OnCreateCommand());
 
     this.onMessage("startGame", () => {
+      console.log("startGame");
       this.dispatcher.dispatch(new OnGameStartCommand());
     });
 
@@ -124,6 +126,10 @@ export class GameRoom extends Room<WordGameState> {
         });
       }
     );
+
+    this.onMessage("playWord", () => {
+      this.dispatcher.dispatch(new CheckWordsCommand());
+    });
   }
 
   onJoin(client: Client, options: any) {

@@ -32,7 +32,11 @@
     <div class="player-1-area">
       <!-- User Player (Player 1) -->
       <template v-if="userPlayer !== null">
-        <game-tiles :tiles="userPlayer.hand"></game-tiles>
+        <game-buttons></game-buttons>
+        <game-tiles
+          v-if="gameStarted === true"
+          :tiles="userPlayer.hand"
+        ></game-tiles>
         <player-card :player="userPlayer" :playerId="sessionId"></player-card>
       </template>
     </div>
@@ -45,13 +49,15 @@ import PlayerCard from '../components/PlayerCard.vue';
 import { Player } from '../schema/Player';
 import { colyseusService } from '../main';
 import GameTiles from '../components/GameTiles.vue';
+import GameButtons from '../components/GameButtons.vue';
 
 export default Vue.extend({
   data() {
     const players: { [id: string]: Player } = {};
     const currentTurn = '';
     const sessionId = '';
-    return { players, currentTurn, sessionId };
+    const gameStarted = false;
+    return { players, currentTurn, sessionId, gameStarted };
   },
   created() {
     // Join the room and subsribe to colyseus updates
@@ -64,14 +70,6 @@ export default Vue.extend({
       };
       room.state.players.onRemove = (_, idx) => {
         this.$delete(this.players, idx);
-      };
-
-      room.state.onChange = changes => {
-        changes.forEach(change => {
-          if (change.field === 'currentTurn') {
-            this.currentTurn = change.value;
-          }
-        });
       };
 
       this.sessionId = room.sessionId;
@@ -91,9 +89,20 @@ export default Vue.extend({
       return null;
     },
   },
+  watch: {
+    updatedCurrentTurn() {
+      this.currentTurn =
+        colyseusService.room?.state.currentTurn ?? this.currentTurn;
+    },
+    updateGameStarted() {
+      this.gameStarted =
+        colyseusService.room?.state.gameStarted ?? this.gameStarted;
+    },
+  },
   components: {
     PlayerCard,
     GameTiles,
+    GameButtons,
   },
 });
 </script>
