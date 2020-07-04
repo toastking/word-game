@@ -21,12 +21,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import { colyseusService } from '../main';
+import { mapState } from 'vuex';
 
 export default Vue.extend({
   data() {
     return {
-      gameStarted: false,
-      currentTurn: '',
       playerId: '',
       loading: false,
     };
@@ -35,15 +34,14 @@ export default Vue.extend({
     const room = colyseusService.room;
     if (room) {
       this.playerId = room.sessionId;
-
-      this.gameStarted = room.state.gameStarted;
-      this.currentTurn = room.state.currentTurn;
     }
   },
   computed: {
     isYourTurn(): boolean {
       return this.currentTurn === this.playerId;
     },
+
+    ...mapState({ gameStarted: 'gameStarted', currentTurn: 'currentTurn' }),
   },
   methods: {
     startGame() {
@@ -51,20 +49,6 @@ export default Vue.extend({
     },
     playWord() {
       colyseusService.room?.send('playWord');
-    },
-  },
-  watch: {
-    updatedGameStarted() {
-      const room = colyseusService?.room;
-      if (room) {
-        this.gameStarted = room.state.gameStarted;
-      }
-    },
-    updateCurrentTurn() {
-      const room = colyseusService?.room;
-      if (room) {
-        this.currentTurn = room.state.currentTurn;
-      }
     },
   },
 });

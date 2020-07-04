@@ -50,14 +50,14 @@ import { Player } from '../schema/Player';
 import { colyseusService } from '../main';
 import GameTiles from '../components/GameTiles.vue';
 import GameButtons from '../components/GameButtons.vue';
+import { mapState, mapMutations } from 'vuex';
+import { GameState } from '../store';
 
 export default Vue.extend({
   data() {
     const players: { [id: string]: Player } = {};
-    const currentTurn = '';
     const sessionId = '';
-    const gameStarted = false;
-    return { players, currentTurn, sessionId, gameStarted };
+    return { players, sessionId };
   },
   created() {
     // Join the room and subsribe to colyseus updates
@@ -70,6 +70,19 @@ export default Vue.extend({
       };
       room.state.players.onRemove = (_, idx) => {
         this.$delete(this.players, idx);
+      };
+
+      room.state.onChange = changes => {
+        changes.forEach(change => {
+          switch (change.field) {
+            case 'gameStarted':
+              this.$store.commit('updateGameStarted', change.value);
+              break;
+            case 'currentTurn':
+              this.$store.commit('updateCurrentTurn', change.value);
+              break;
+          }
+        });
       };
 
       this.sessionId = room.sessionId;
@@ -88,16 +101,10 @@ export default Vue.extend({
       }
       return null;
     },
-  },
-  watch: {
-    updatedCurrentTurn() {
-      this.currentTurn =
-        colyseusService.room?.state.currentTurn ?? this.currentTurn;
-    },
-    updateGameStarted() {
-      this.gameStarted =
-        colyseusService.room?.state.gameStarted ?? this.gameStarted;
-    },
+    ...mapState<GameState>({
+      currentTurn: 'currentTurn',
+      gameStarted: 'gameStarted',
+    }),
   },
   components: {
     PlayerCard,
