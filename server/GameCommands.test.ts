@@ -65,6 +65,7 @@ describe("GameCommands", () => {
         room.state.placedTiles.push(...placedTiles);
         room.state.players["id"] = new Player();
         room.state.currentTurn = "id";
+        room.state.turn = 2;
 
         const dispatcher = new Dispatcher(room);
 
@@ -122,6 +123,7 @@ describe("GameCommands", () => {
         room.state.placedTiles.push(...placedTiles);
         room.state.players["id"] = new Player();
         room.state.currentTurn = "id";
+        room.state.turn = 2;
 
         const dispatcher = new Dispatcher(room);
 
@@ -175,6 +177,7 @@ describe("GameCommands", () => {
         const player = new Player();
         player.hand.push(placedTile.tile);
         room.state.players["id"] = player;
+        room.state.currentTurn = "id";
 
         const dispatcher = new Dispatcher(room);
 
@@ -240,6 +243,7 @@ describe("GameCommands", () => {
         const player = new Player();
         player.hand.push(placedTile.tile);
         room.state.players["id"] = player;
+        room.state.currentTurn = "id";
 
         placedTiles.forEach((tile) => {
           room.state.placedTiles.push(tile);

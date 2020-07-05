@@ -38,7 +38,10 @@ export class PlaceTileCommand extends Command<
   WordGameState,
   { tile: PlacedTile; sessionId: string }
 > {
-  validate({ tile }: this["payload"]) {
+  validate({ tile, sessionId }: this["payload"]) {
+    if (this.state.currentTurn !== sessionId) {
+      return false;
+    }
     // You can only place tiles on empty game board spaces
     return isEmptySpace(tile.row, tile.column, this.state.gameBoard);
   }
@@ -61,9 +64,11 @@ export class RemoveTileCommand extends Command<
   WordGameState,
   { tile: PlacedTile; sessionId: string }
 > {
-  validate({ tile }: this["payload"]) {
-    //TODO: add some validation to check if it's the players current turn
-    // Check that it's actually in the list of placed tiles
+  validate({ tile, sessionId }: this["payload"]) {
+    if (this.state.currentTurn !== sessionId) {
+      return false;
+    }
+
     return this.state.placedTiles.some(
       (placedTile) =>
         placedTile.row === tile.row && placedTile.column === tile.column
@@ -128,28 +133,46 @@ export class CheckWordsCommand extends Command<WordGameState, {}> {
 /** Build a word that's mainly horizontal */
 export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
   validate() {
-    //Check that the horizontal word intersection with other words
-    const hasIntersections = this.state.placedTiles.some((tile) => {
-      return (
-        !isEmptySpace(tile.row + 1, tile.column, this.state.gameBoard) ||
-        !isEmptySpace(tile.row - 1, tile.column, this.state.gameBoard)
+    if (this.state.turn === 1) {
+      //If it's the first turn make sure it goes through the middle spot
+      const sortedPlacedTiles = [...this.state.placedTiles].sort(
+        sortPlacedTiles
       );
-    });
+      const firstTile = sortedPlacedTiles[0];
+      const midwayPoint = Math.floor(BOARD_SIZE / 2);
+      return firstTile.row === midwayPoint && firstTile.column === midwayPoint;
+    } else {
+      //Check that the horizontal word intersection with other words if it's past the first turn
+      const hasIntersections = this.state.placedTiles.some((tile) => {
+        return (
+          !isEmptySpace(tile.row + 1, tile.column, this.state.gameBoard) ||
+          !isEmptySpace(tile.row - 1, tile.column, this.state.gameBoard)
+        );
+      });
 
-    const firstTile: PlacedTile = this.state.placedTiles[0];
-    const lastTile: PlacedTile = this.state.placedTiles[
-      this.state.placedTiles.length - 1
-    ];
-    return (
-      !isEmptySpace(
-        firstTile.row,
-        firstTile.column - 1,
-        this.state.gameBoard
-      ) ||
-      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
-      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
-      hasIntersections
-    );
+      const firstTile: PlacedTile = this.state.placedTiles[0];
+      const lastTile: PlacedTile = this.state.placedTiles[
+        this.state.placedTiles.length - 1
+      ];
+      return (
+        !isEmptySpace(
+          firstTile.row,
+          firstTile.column - 1,
+          this.state.gameBoard
+        ) ||
+        !isEmptySpace(
+          lastTile.row,
+          lastTile.column + 1,
+          this.state.gameBoard
+        ) ||
+        !isEmptySpace(
+          lastTile.row,
+          lastTile.column + 1,
+          this.state.gameBoard
+        ) ||
+        hasIntersections
+      );
+    }
   }
 
   execute() {
@@ -213,27 +236,45 @@ export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
 export class BuildVerticalWordCommand extends Command<WordGameState, {}> {
   validate() {
     //Check that the horizontal word intersection with other words
-    const hasIntersections = this.state.placedTiles.some((tile) => {
-      return (
-        !isEmptySpace(tile.row, tile.column - 1, this.state.gameBoard) ||
-        !isEmptySpace(tile.row, tile.column + 1, this.state.gameBoard)
+    if (this.state.turn === 1) {
+      //If it's the first turn make sure it goes through the middle spot
+      const sortedPlacedTiles = [...this.state.placedTiles].sort(
+        sortPlacedTiles
       );
-    });
+      const firstTile = sortedPlacedTiles[0];
+      const midwayPoint = Math.floor(BOARD_SIZE / 2);
+      return firstTile.row === midwayPoint && firstTile.column === midwayPoint;
+    } else {
+      const hasIntersections = this.state.placedTiles.some((tile) => {
+        return (
+          !isEmptySpace(tile.row, tile.column - 1, this.state.gameBoard) ||
+          !isEmptySpace(tile.row, tile.column + 1, this.state.gameBoard)
+        );
+      });
 
-    const firstTile: PlacedTile = this.state.placedTiles[0];
-    const lastTile: PlacedTile = this.state.placedTiles[
-      this.state.placedTiles.length - 1
-    ];
-    return (
-      !isEmptySpace(
-        firstTile.row,
-        firstTile.column - 1,
-        this.state.gameBoard
-      ) ||
-      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
-      !isEmptySpace(lastTile.row, lastTile.column + 1, this.state.gameBoard) ||
-      hasIntersections
-    );
+      const firstTile: PlacedTile = this.state.placedTiles[0];
+      const lastTile: PlacedTile = this.state.placedTiles[
+        this.state.placedTiles.length - 1
+      ];
+      return (
+        !isEmptySpace(
+          firstTile.row,
+          firstTile.column - 1,
+          this.state.gameBoard
+        ) ||
+        !isEmptySpace(
+          lastTile.row,
+          lastTile.column + 1,
+          this.state.gameBoard
+        ) ||
+        !isEmptySpace(
+          lastTile.row,
+          lastTile.column + 1,
+          this.state.gameBoard
+        ) ||
+        hasIntersections
+      );
+    }
   }
 
   execute() {
@@ -312,6 +353,7 @@ export class AddToPlayerScore extends Command<
 /** Checks if it's game over, if it is does the final scoring and state changes */
 export class CheckForGameOverComand extends Command<WordGameState, {}> {
   execute() {
+    //TODO: change the game over logic to do one final turn, then add to the score
     if (this.state.tileDeck.length === 0) {
       this.state.gameOver = true;
     }
