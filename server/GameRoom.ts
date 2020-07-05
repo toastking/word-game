@@ -18,6 +18,15 @@ export class Tile extends Schema {
   letter: string;
   @type("number")
   points: number = -1;
+  constructor(letter?: string, points?: number) {
+    super();
+    if (letter) {
+      this.letter = letter;
+    }
+    if (points) {
+      this.points = points;
+    }
+  }
 }
 
 /** Represents a tile played by a player on the board */
@@ -99,12 +108,12 @@ export class GameRoom extends Room<WordGameState> {
 
     this.onMessage(
       "placeTile",
-      (client, message: { row: number; column: number; tile: Tile }) => {
-        const placedTile = new PlacedTile(
-          message.row,
-          message.column,
-          message.tile
-        );
+      (
+        client,
+        message: { row: number; column: number; letter: string; points: number }
+      ) => {
+        const tile = new Tile(message.letter, message.points);
+        const placedTile = new PlacedTile(message.row, message.column, tile);
         this.dispatcher.dispatch(new PlaceTileCommand(), {
           tile: placedTile,
           sessionId: client.sessionId,
@@ -114,12 +123,12 @@ export class GameRoom extends Room<WordGameState> {
 
     this.onMessage(
       "removeTile",
-      (client, message: { row: number; column: number; tile: Tile }) => {
-        const placedTile = new PlacedTile(
-          message.row,
-          message.column,
-          message.tile
-        );
+      (
+        client,
+        message: { row: number; column: number; letter: string; points: number }
+      ) => {
+        const tile = new Tile(message.letter, message.points);
+        const placedTile = new PlacedTile(message.row, message.column, tile);
         this.dispatcher.dispatch(new RemoveTileCommand(), {
           tile: placedTile,
           sessionId: client.sessionId,

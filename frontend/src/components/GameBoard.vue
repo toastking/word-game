@@ -1,10 +1,9 @@
 <template>
   <div class="game-board box">
     <game-board-section
-      v-for="(tile, idx) in gameBoard"
+      v-for="idx in gameBoardLength"
       :key="idx"
       :idx="idx"
-      :tile="tile"
       gridItemClass="grid-item"
     ></game-board-section>
   </div>
@@ -16,6 +15,9 @@ import { mapState } from 'vuex';
 import GameBoardSection from '@/components/GameBoardSection.vue';
 export default Vue.extend({
   computed: {
+    gameBoardLength() {
+      return this.gameBoard.length;
+    },
     ...mapState(['gameBoard']),
   },
   components: {
@@ -30,7 +32,5 @@ $grid-size: 15;
   display: grid;
   grid-template-rows: repeat($grid-size, 1fr);
   grid-template-columns: repeat($grid-size, 1fr);
-  column-gap: 5px;
-  row-gap: 5px;
 }
 </style>

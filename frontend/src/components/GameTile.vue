@@ -32,9 +32,7 @@ export default Vue.extend({
   methods: {
     ...mapMutations(['updateSelectedTile']),
     clickHandler(): void {
-      if (this.idx) {
-        this.updateSelectedTile(this.idx);
-      }
+      this.updateSelectedTile(this.idx ?? -1);
     },
   },
 });

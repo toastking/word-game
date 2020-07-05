@@ -59,14 +59,19 @@ export default new Vuex.Store<GameState>({
     updateSelectedTile(state, idx: number) {
       state.selectedTile = idx;
     },
+    resetSelectedTile(state) {
+      state.selectedTile = -1;
+    },
   },
   getters: {
     /** Get the tile at a specified row and column in the grid */
     getTile(state) {
-      return (row: number, column: number) => {
-        const idx = calculateIndex(row, column);
+      return (idx: number) => {
         return state.gameBoard[idx];
       };
+    },
+    getSelectedTile(state): Tile {
+      return state.playerHand[state.selectedTile];
     },
   },
   actions: {},
