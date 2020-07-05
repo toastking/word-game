@@ -2,7 +2,7 @@
   <div
     class="box game-tile"
     :class="{ 'has-background-grey-lighter': isSelectedTile }"
-    @click="clickHandler()"
+    @click="clicked()"
   >
     <p
       id="letter"
@@ -30,9 +30,8 @@ export default Vue.extend({
     },
   },
   methods: {
-    ...mapMutations(['updateSelectedTile']),
-    clickHandler(): void {
-      this.updateSelectedTile(this.idx ?? -1);
+    clicked() {
+      this.$emit('tile-clicked');
     },
   },
 });

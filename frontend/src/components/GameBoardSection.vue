@@ -5,8 +5,15 @@
       class="empty-grid-item box"
       :class="gridItemClass"
       @click="placeTile()"
-    ></div>
-    <game-tile v-else :tile="tile"></game-tile>
+    >
+      <b-icon
+        v-if="isMiddleSpace === true"
+        pack="fas"
+        icon="star"
+        type="is-primary"
+      ></b-icon>
+    </div>
+    <game-tile v-else :tile="tile" v-on:tile-clicked="removeTile()"></game-tile>
   </div>
 </template>
 
@@ -43,6 +50,10 @@ export default Vue.extend({
       const row = Math.floor(this.idx / BOARD_SIZE);
       return row;
     },
+    isMiddleSpace(): boolean {
+      const midwayPoint = Math.floor(BOARD_SIZE / 2);
+      return this.row === midwayPoint && this.column === midwayPoint;
+    },
     ...mapGetters(['getSelectedTile', 'getTile']),
   },
   methods: {
@@ -58,6 +69,14 @@ export default Vue.extend({
       //Reset the selected tile
       this.$store.commit('resetSelectedTile');
     },
+    removeTile() {
+      colyseusService.room?.send('removeTile', {
+        row: this.row,
+        column: this.column,
+        letter: this.tile.letter,
+        points: this.tile.points,
+      });
+    },
   },
   components: {
     GameTile,
@@ -65,13 +84,17 @@ export default Vue.extend({
 });
 </script>
 <style scoped>
+.grid-space,
 .empty-grid-item {
   width: 100%;
   height: 100%;
+}
+
+.grid-space {
   cursor: pointer;
 }
 
-.empty-grid-item:hover {
+.grid-space:hover {
   background: hsl(206, 70%, 96%);
 }
 </style>

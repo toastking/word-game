@@ -28,7 +28,8 @@ export class InitializeGameBoardCommand extends Command<WordGameState, {}> {
   execute() {
     // Add blank tiles to all the game boards
     for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
-      this.state.gameBoard.push(new Tile());
+      const tile = new Tile();
+      this.state.gameBoard.push(tile);
     }
   }
 }
@@ -48,7 +49,9 @@ export class PlaceTileCommand extends Command<
 
   execute({ tile, sessionId }: this["payload"]) {
     //Add the tile to the board and to the list of tiles
-    this.state.gameBoard[calculatedIndex(tile.row, tile.column)] = tile.tile;
+    this.state.gameBoard[
+      calculatedIndex(tile.row, tile.column)
+    ] = tile.tile.clone();
     this.state.placedTiles.push(tile);
     //Remove the tile from the players hand
     const player: Player = this.state.players[sessionId];
@@ -83,14 +86,11 @@ export class RemoveTileCommand extends Command<
     // If it found the value remove it from both the tile list and the game board
     if (indexToRemove >= 0) {
       this.state.placedTiles.splice(indexToRemove, 1);
-      this.state.gameBoard.splice(
-        calculatedIndex(tile.row, tile.column),
-        1,
-        new Tile()
-      );
+      const idx = calculatedIndex(tile.row, tile.column);
+      this.state.gameBoard[idx] = new Tile();
 
       //Add the removed tile to the players hand
-      (this.state.players[sessionId] as Player).hand.push(tile.tile);
+      (this.state.players[sessionId] as Player).hand.push(tile.tile.clone());
     }
   }
 }
@@ -121,6 +121,7 @@ export class CheckWordsCommand extends Command<WordGameState, {}> {
     const isHorizontal = this.state.placedTiles.every(
       (tile) => firstTile.row === tile.row
     );
+    console.log("test point 1");
     if (isHorizontal) {
       return [new BuildHorizontalWordCommand()];
     }
@@ -176,6 +177,7 @@ export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
   }
 
   execute() {
+    console.log("test point 2");
     const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
     const words: Tile[][] = [];
     const firstPlacedTile: PlacedTile = sortedPlacedTiles[0];

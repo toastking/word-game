@@ -6,6 +6,7 @@
       :key="idx"
       :idx="idx"
       :tile="tile"
+      v-on:tile-clicked="clickHandler(idx)"
     ></game-tile>
   </div>
 </template>
@@ -13,10 +14,16 @@
 <script lang="ts">
 import Vue from 'vue';
 import GameTile from './GameTile.vue';
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 export default Vue.extend({
   computed: {
     ...mapState({ tiles: 'playerHand' }),
+  },
+  methods: {
+    ...mapMutations(['updateSelectedTile']),
+    clickHandler(idx: number): void {
+      this.updateSelectedTile(idx);
+    },
   },
   components: {
     GameTile,

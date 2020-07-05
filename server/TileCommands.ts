@@ -69,8 +69,8 @@ export class DrawTilesCommand extends Command<
     const toDraw = MAX_HAND - player.hand.length;
     for (let i = 0; i < toDraw; i++) {
       const randomIdx = Math.floor(Math.random() * this.state.tileDeck.length);
-      const drawnTile = this.state.tileDeck.splice(randomIdx, 1);
-      (this.state.players[sessionId] as Player).hand.push(drawnTile[0]);
+      const drawnTile: Tile = this.state.tileDeck.splice(randomIdx, 1)[0];
+      (this.state.players[sessionId] as Player).hand.push(drawnTile.clone());
     }
   }
 }

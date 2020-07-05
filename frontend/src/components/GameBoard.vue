@@ -1,9 +1,10 @@
 <template>
   <div class="game-board box">
+    <!-- NOTE: v-for with a range starts at 1 -->
     <game-board-section
       v-for="idx in gameBoardLength"
       :key="idx"
-      :idx="idx"
+      :idx="idx - 1"
       gridItemClass="grid-item"
     ></game-board-section>
   </div>

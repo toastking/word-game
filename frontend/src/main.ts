@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faCrown, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Buefy from 'buefy';
 import 'buefy/dist/buefy.css';
@@ -15,6 +15,7 @@ export const colyseusService = new ColyseusService();
 
 Vue.config.productionTip = false;
 library.add(faCrown);
+library.add(faStar);
 
 Vue.component('vue-fontawesome', FontAwesomeIcon);
 
