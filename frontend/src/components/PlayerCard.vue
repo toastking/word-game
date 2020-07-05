@@ -17,17 +17,18 @@
 import Vue, { PropType } from 'vue';
 import { Player } from '@/schema/Player';
 import { mapState } from 'vuex';
+import { PlayerState } from '../store';
 export default Vue.extend({
   props: {
-    player: {
-      type: Object as PropType<Player>,
-    },
     playerId: String,
   },
   computed: {
-    ...mapState({ currentTurn: 'currentTurn' }),
+    ...mapState(['currentTurn', 'players']),
     isYourTurn() {
       return this.playerId === this.currentTurn;
+    },
+    player(): PlayerState {
+      return this.players[this.playerId];
     },
   },
 });

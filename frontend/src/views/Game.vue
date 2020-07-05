@@ -4,7 +4,6 @@
       <!-- Player 3 -->
       <player-card
         v-if="playerCount > 2"
-        :player="players[nonUserPlayersIds[1]]"
         :playerId="nonUserPlayersIds[1]"
         :currentTurn="currentTurn"
       ></player-card>
@@ -14,7 +13,6 @@
       <!-- Player 2 -->
       <player-card
         v-if="playerCount > 1"
-        :player="players[nonUserPlayersIds[0]]"
         :playerId="nonUserPlayersIds[0]"
         :currentTurn="currentTurn"
       ></player-card>
@@ -26,20 +24,16 @@
       <!-- Player 4 -->
       <player-card
         v-if="playerCount > 3"
-        :player="players[nonUserPlayersIds[2]]"
         :playerId="nonUserPlayersIds[2]"
         :currentTurn="currentTurn"
       ></player-card>
     </div>
     <div class="player-1-area">
       <!-- User Player (Player 1) -->
-      <template v-if="userPlayer !== null">
+      <template v-if="hasUserPlayer === true">
         <game-buttons></game-buttons>
-        <game-tiles
-          v-if="gameStarted === true"
-          :tiles="userPlayer.hand"
-        ></game-tiles>
-        <player-card :player="userPlayer" :playerId="sessionId"></player-card>
+        <game-tiles v-if="gameStarted === true"></game-tiles>
+        <player-card :playerId="playerId"></player-card>
       </template>
     </div>
   </div>
@@ -52,16 +46,11 @@ import { Player } from '../schema/Player';
 import { colyseusService } from '../main';
 import GameTiles from '../components/GameTiles.vue';
 import GameButtons from '../components/GameButtons.vue';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapGetters } from 'vuex';
 import { GameState } from '../store';
 import GameBoard from '@/components/GameBoard.vue';
 
 export default Vue.extend({
-  data() {
-    const players: { [id: string]: Player } = {};
-    const sessionId = '';
-    return { players, sessionId };
-  },
   created() {
     // Join the room and subsribe to colyseus updates
     const roomId = this.$route.params.roomId;
@@ -69,10 +58,14 @@ export default Vue.extend({
     if (room) {
       //Setup player list
       room.state.players.onAdd = (player, idx) => {
-        this.$set(this.players, idx, player);
+        this.$store.commit('updatePlayer', { player, id: idx });
       };
       room.state.players.onRemove = (_, idx) => {
-        this.$delete(this.players, idx);
+        this.$store.commit('removePlayer', idx);
+      };
+      // Set the player hand and setup handlers
+      room.state.players.onChange = (player, id) => {
+        this.$store.commit('updatePlayer', { player, id });
       };
 
       room.state.onChange = changes => {
@@ -102,34 +95,17 @@ export default Vue.extend({
         this.$store.commit('updateTile', { idx, tile });
       };
 
-      // Set the player hand and setup handlers
-
-      room.state.players.onChange = (player, key) => {
-        if (key === room.sessionId) {
-          this.$store.commit('setHand', player.hand);
-        }
-      };
-
-      this.sessionId = room.sessionId;
+      this.$store.commit('setPlayerId', room.sessionId);
     }
   },
   computed: {
-    playerCount(): number {
-      return Object.keys(this.players).length;
-    },
-    nonUserPlayersIds(): string[] {
-      return Object.keys(this.players).filter(key => key !== this.sessionId);
-    },
-    userPlayer(): Player | null {
-      if (this.sessionId in this.players) {
-        return this.players[this.sessionId];
-      }
-      return null;
-    },
-    ...mapState<GameState>({
-      currentTurn: 'currentTurn',
-      gameStarted: 'gameStarted',
-    }),
+    ...mapState<GameState>([
+      'currentTurn',
+      'gameStarted',
+      'players',
+      'playerId',
+    ]),
+    ...mapGetters(['nonUserPlayerIds', 'playerCount', 'hasUserPlayer']),
   },
   components: {
     PlayerCard,
