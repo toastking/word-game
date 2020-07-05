@@ -87,6 +87,9 @@ export class WordGameState extends Schema {
 
   @type("boolean")
   gameStarted = false;
+
+  @type("number")
+  turn = 1;
 }
 
 export class GameRoom extends Room<WordGameState> {

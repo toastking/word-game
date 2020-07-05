@@ -47,4 +47,16 @@ describe("PlayerCommands", () => {
 
     expect(room.state.currentTurn).toBe("id2");
   });
+
+  test("NextPlayerCommand increments the turn counter on the last player", () => {
+    room.state.players["id"] = new Player();
+    room.state.players["id2"] = new Player();
+    room.state.currentTurn = "id2";
+    room.state.turn = 1;
+
+    const dispatcher = new Dispatcher(room);
+    dispatcher.dispatch(new NextPlayerCommand());
+
+    expect(room.state.turn).toBe(2);
+  });
 });

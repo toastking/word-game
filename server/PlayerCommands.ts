@@ -30,6 +30,9 @@ export class NextPlayerCommand extends Command<WordGameState, {}> {
     const currentIdx = ids.findIndex((id) => id === this.state.currentTurn);
     const nextIdx = (currentIdx + 1) % ids.length;
     this.state.currentTurn = ids[nextIdx];
+    if (currentIdx === ids.length - 1) {
+      return [new IncrementTurnCommand()];
+    }
   }
 }
 
@@ -37,5 +40,12 @@ export class NextPlayerCommand extends Command<WordGameState, {}> {
 export class SetStartPlayerCommand extends Command<WordGameState, {}> {
   execute() {
     this.state.currentTurn = Object.keys(this.state.players)[0];
+  }
+}
+
+/** Increments the turn counter */
+export class IncrementTurnCommand extends Command<WordGameState, {}> {
+  execute() {
+    this.state.turn = this.state.turn + 1;
   }
 }
