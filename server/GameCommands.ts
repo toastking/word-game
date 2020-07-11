@@ -95,233 +95,157 @@ export class RemoveTileCommand extends Command<
   }
 }
 
-/** Checks the words the placed tiles make are valid words */
-export class CheckWordsCommand extends Command<WordGameState, {}> {
+/** Interface representing a node in the trie */
+interface TrieNode {
+  letter: string;
+  points: number;
+  children: TrieNode[];
+  /** Whether or not we "reverse" the node */
+  reverse: boolean;
+}
+
+/** Builds words based on placed tiles. This constructs a trie of all the words. */
+export class BuildWordCommand extends Command<WordGameState, {}> {
   validate() {
     if (this.state.placedTiles.length === 0) {
       return false;
     }
 
-    //Check that we have all the same rows or columns to see if the tiles are at a diagonal
-    const hasDifferentRows = this.state.placedTiles.some(
-      (tile) => this.state.placedTiles[0].row !== tile.row
-    );
-    const hasDifferentColumns = this.state.placedTiles.some(
-      (tile) => this.state.placedTiles[0].column !== tile.column
-    );
-    if (hasDifferentColumns && hasDifferentRows) {
-      return false;
-    }
-
-    return true;
-  }
-
-  execute() {
-    const firstTile = this.state.placedTiles[0];
-    const isHorizontal = this.state.placedTiles.every(
-      (tile) => firstTile.row === tile.row
-    );
-    console.log("test point 1");
-    if (isHorizontal) {
-      return [new BuildHorizontalWordCommand()];
-    }
-
-    // If it's not horizontal, given the validator, we can assume it's vertical
-    return [new BuildVerticalWordCommand()];
-  }
-}
-
-/** Build a word that's mainly horizontal */
-export class BuildHorizontalWordCommand extends Command<WordGameState, {}> {
-  validate() {
-    if (this.state.turn === 1) {
-      //If it's the first turn make sure it goes through the middle spot
-      const sortedPlacedTiles = [...this.state.placedTiles].sort(
-        sortPlacedTiles
-      );
-      const firstTile = sortedPlacedTiles[0];
-      const midwayPoint = Math.floor(BOARD_SIZE / 2);
-      return firstTile.row === midwayPoint && firstTile.column === midwayPoint;
-    } else {
-      //Check that the horizontal word intersection with other words if it's past the first turn
-      const hasIntersections = this.state.placedTiles.some((tile) => {
+    const sortedPlacedTiles = this.state.placedTiles.sort(sortPlacedTiles);
+    const isHorizontalContiguous = sortedPlacedTiles.every(
+      (tile, idx, placedTiles) => {
         return (
-          !isEmptySpace(tile.row + 1, tile.column, this.state.gameBoard) ||
-          !isEmptySpace(tile.row - 1, tile.column, this.state.gameBoard)
+          idx === 0 ||
+          (tile.row === placedTiles[idx - 1].row &&
+            Math.abs(tile.column - placedTiles[idx - 1].column) === 1)
         );
-      });
+      }
+    );
+    const isVerticalContiguous = sortedPlacedTiles.every(
+      (tile, idx, placedTiles) => {
+        return (
+          idx === 0 ||
+          (tile.column === placedTiles[idx - 1].column &&
+            Math.abs(tile.row - placedTiles[idx - 1].row) === 1)
+        );
+      }
+    );
 
-      const firstTile: PlacedTile = this.state.placedTiles[0];
-      const lastTile: PlacedTile = this.state.placedTiles[
-        this.state.placedTiles.length - 1
-      ];
+    if (this.state.turn === 1) {
+      //If it's the first turn, we don't care about intesections. We only care that it's a contiguous horizonal or vertical word that at some point goes through the middle square
+      const midwayPoint = Math.floor(BOARD_SIZE / 2);
+      const validPlacement = this.state.placedTiles.some((tile) => {
+        return tile.row === midwayPoint && tile.column === midwayPoint;
+      });
+      return validPlacement && (isVerticalContiguous || isHorizontalContiguous);
+    } else {
+      //If it's not the first turn, we also need to make sure this word intersects with another word at some point
+      const coordinates = this.state.placedTiles.map((placedTile) =>
+        toPlacedTileString(placedTile.row, placedTile.column)
+      );
+      const placedTileCoordinates = new Set([...coordinates]);
+      const hasIntersections = this.state.placedTiles.some((placedTile) => {
+        // Check to the left, above, to the right, and below. Check the space
+        // is not empty as well as that the space is not a user placed tile
+        const toCheck: Array<[number, number]> = [
+          [placedTile.row - 1, placedTile.column],
+          [placedTile.row, placedTile.column - 1],
+          [placedTile.row + 1, placedTile.column],
+          [placedTile.row, placedTile.column + 1],
+        ];
+        return toCheck
+          .filter(
+            (coords) =>
+              !placedTileCoordinates.has(
+                toPlacedTileString(coords[0], coords[1])
+              )
+          )
+          .some(
+            (coords) =>
+              !isEmptySpace(coords[0], coords[1], this.state.gameBoard)
+          );
+      });
       return (
-        !isEmptySpace(
-          firstTile.row,
-          firstTile.column - 1,
-          this.state.gameBoard
-        ) ||
-        !isEmptySpace(
-          lastTile.row,
-          lastTile.column + 1,
-          this.state.gameBoard
-        ) ||
-        !isEmptySpace(
-          lastTile.row,
-          lastTile.column + 1,
-          this.state.gameBoard
-        ) ||
-        hasIntersections
+        hasIntersections && (isVerticalContiguous || isHorizontalContiguous)
       );
     }
   }
 
   execute() {
-    console.log("test point 2");
-    const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
-    const words: Tile[][] = [];
-    const firstPlacedTile: PlacedTile = sortedPlacedTiles[0];
+    //Add the placed word
+    const words: Array<Tile[]> = [];
+    // Add the placed word to the list of letters
+    const visited = new Set<string>();
 
-    let columnCursor = firstPlacedTile.column;
-
-    // Get the row of the horizontal word so we can check for vertical intersections
-    const { row } = firstPlacedTile;
-    //While it's an actual tile decremment the counter
-    while (!isEmptySpace(row, columnCursor - 1, this.state.gameBoard)) {
-      columnCursor--;
-    }
-    const startColumn = columnCursor;
-
-    //Now find the end of the word
-    const lastPlacedTile: PlacedTile =
-      sortedPlacedTiles[sortPlacedTiles.length - 1];
-    columnCursor = lastPlacedTile.column;
-
-    while (!isEmptySpace(row, columnCursor + 1, this.state.gameBoard)) {
-      columnCursor++;
-    }
-    const endColumn = columnCursor;
-
-    for (let column = startColumn; column <= endColumn; column++) {
-      // If the start index is not empty decrement the row as long as we can
-      let innerStartCursor = row;
+    //Build words for each of the placed tiles by looking veritcally and horizontally
+    for (let placedTile of this.state.placedTiles) {
+      //Check for vertical words first by going up from the word, then down
+      let rowCursor = placedTile.row;
       while (
-        !isEmptySpace(innerStartCursor - 1, column, this.state.gameBoard)
+        !visited.has(toPlacedTileString(rowCursor - 1, placedTile.column)) &&
+        !isEmptySpace(rowCursor - 1, placedTile.column, this.state.gameBoard)
       ) {
-        innerStartCursor--;
+        rowCursor--;
+        visited.add(toPlacedTileString(rowCursor, placedTile.column));
       }
+      const verticalStart = rowCursor;
 
-      let innerEndCursor = row;
-      while (!isEmptySpace(innerEndCursor + 1, column, this.state.gameBoard)) {
-        innerEndCursor++;
+      rowCursor = placedTile.row;
+      while (
+        !visited.has(toPlacedTileString(rowCursor + 1, placedTile.column)) &&
+        !isEmptySpace(rowCursor + 1, placedTile.column, this.state.gameBoard)
+      ) {
+        rowCursor++;
+        visited.add(toPlacedTileString(rowCursor, placedTile.column));
       }
+      const verticalEnd = rowCursor;
 
-      // Check if a word was actually formed, if it was then we append the word list
-      if (innerStartCursor !== innerEndCursor) {
-        const word: Tile[] = [];
-        for (let row = innerStartCursor; row <= innerEndCursor; row++) {
-          word.push(this.state.gameBoard[calculatedIndex(row, column)]);
+      if (verticalEnd !== verticalStart) {
+        const verticalWord: Tile[] = [];
+        for (let row = verticalStart; row <= verticalEnd; row++) {
+          verticalWord.push(
+            this.state.gameBoard[calculatedIndex(row, placedTile.column)]
+          );
         }
-        words.push(word);
-      }
-    }
-
-    // Add the placed word to the list of letters
-    words.push(this.state.placedTiles.map((placedTile) => placedTile.tile));
-
-    // Set off the scoring  action
-    return [new AddToPlayerScore().setPayload({ words })];
-  }
-}
-
-/** Build a word that's mainly vertical */
-export class BuildVerticalWordCommand extends Command<WordGameState, {}> {
-  validate() {
-    //Check that the horizontal word intersection with other words
-    if (this.state.turn === 1) {
-      //If it's the first turn make sure it goes through the middle spot
-      const sortedPlacedTiles = [...this.state.placedTiles].sort(
-        sortPlacedTiles
-      );
-      const firstTile = sortedPlacedTiles[0];
-      const midwayPoint = Math.floor(BOARD_SIZE / 2);
-      return firstTile.row === midwayPoint && firstTile.column === midwayPoint;
-    } else {
-      const hasIntersections = this.state.placedTiles.some((tile) => {
-        return (
-          !isEmptySpace(tile.row, tile.column - 1, this.state.gameBoard) ||
-          !isEmptySpace(tile.row, tile.column + 1, this.state.gameBoard)
-        );
-      });
-
-      const firstTile: PlacedTile = this.state.placedTiles[0];
-      const lastTile: PlacedTile = this.state.placedTiles[
-        this.state.placedTiles.length - 1
-      ];
-      return (
-        !isEmptySpace(
-          firstTile.row,
-          firstTile.column - 1,
-          this.state.gameBoard
-        ) ||
-        !isEmptySpace(
-          lastTile.row,
-          lastTile.column + 1,
-          this.state.gameBoard
-        ) ||
-        !isEmptySpace(
-          lastTile.row,
-          lastTile.column + 1,
-          this.state.gameBoard
-        ) ||
-        hasIntersections
-      );
-    }
-  }
-
-  execute() {
-    const sortedPlacedTiles = [...this.state.placedTiles].sort(sortPlacedTiles);
-    const words: Tile[][] = [];
-
-    //Get the start row for the word
-    const firstPlacedTile: PlacedTile = sortedPlacedTiles[0];
-    const startRow = firstPlacedTile.row;
-    //Now find the end of the word
-    const lastPlacedTile: PlacedTile =
-      sortedPlacedTiles[sortPlacedTiles.length - 1];
-    const endRow = lastPlacedTile.row;
-
-    let column = firstPlacedTile.column;
-    for (let row = startRow; row <= endRow; row++) {
-      // If the start index is not empty decrement the row as long as we can
-      let innerStartCursor = column;
-      while (!isEmptySpace(row, innerStartCursor - 1, this.state.gameBoard)) {
-        innerStartCursor--;
+        words.push(verticalWord);
       }
 
-      let innerEndCursor = column;
-      while (!isEmptySpace(row, innerEndCursor + 1, this.state.gameBoard)) {
-        innerEndCursor++;
+      //Now check for a horizontal word
+      //Check for vertical words first by going up from the word, then down
+      let columnCursor = placedTile.column;
+      while (
+        !visited.has(toPlacedTileString(placedTile.row, columnCursor - 1)) &&
+        !isEmptySpace(placedTile.row, columnCursor - 1, this.state.gameBoard)
+      ) {
+        columnCursor--;
+        visited.add(toPlacedTileString(placedTile.row, columnCursor));
       }
+      const horizontalStart = columnCursor;
 
-      // Check if a word was actually formed, if it was then we append the word list
-      if (innerStartCursor !== innerEndCursor) {
-        const word: Tile[] = [];
-        for (
-          let column = innerStartCursor;
-          column <= innerEndCursor;
-          column++
-        ) {
-          word.push(this.state.gameBoard[calculatedIndex(row, column)]);
+      columnCursor = placedTile.column;
+      while (
+        !visited.has(toPlacedTileString(placedTile.row, columnCursor + 1)) &&
+        !isEmptySpace(placedTile.row, columnCursor + 1, this.state.gameBoard)
+      ) {
+        columnCursor++;
+        visited.add(toPlacedTileString(placedTile.row, columnCursor));
+      }
+      const horizontalEnd = columnCursor;
+      if (horizontalEnd !== horizontalStart) {
+        const horizonalWord: Tile[] = [];
+        for (let column = horizontalStart; column <= horizontalEnd; column++) {
+          horizonalWord.push(
+            this.state.gameBoard[calculatedIndex(placedTile.row, column)]
+          );
         }
-        words.push(word);
+        words.push(horizonalWord);
       }
+
+      //Add the coordinatese to the visited list
+      visited.add(toPlacedTileString(placedTile.row, placedTile.column));
     }
 
-    // Add the placed word to the list of letters
-    words.push(this.state.placedTiles.map((placedTile) => placedTile.tile));
-
-    // Set off the scoring  action
+    // Set off the scoring and next turn flow
     return [new AddToPlayerScore().setPayload({ words })];
   }
 }
@@ -345,9 +269,10 @@ export class AddToPlayerScore extends Command<
 
     // Kick off the next actions for the turn
     return [
-      (new DrawTilesCommand().setPayload({ sessionId: this.state.currentTurn }),
+      new DrawTilesCommand().setPayload({ sessionId: this.state.currentTurn }),
       new CheckForGameOverComand(),
-      new NextPlayerCommand()),
+      new NextPlayerCommand(),
+      new ResetPlacedTilesCommand(),
     ];
   }
 }
@@ -359,6 +284,13 @@ export class CheckForGameOverComand extends Command<WordGameState, {}> {
     if (this.state.tileDeck.length === 0) {
       this.state.gameOver = true;
     }
+  }
+}
+
+/** Resets the placed tiles at the end of a turn */
+export class ResetPlacedTilesCommand extends Command<WordGameState, {}> {
+  execute() {
+    this.state.placedTiles.splice(0, this.state.placedTiles.length);
   }
 }
 
@@ -392,4 +324,12 @@ function isEmptySpace(row: number, column: number, board: ArraySchema<Tile>) {
     return true;
   }
   return board[calculatedIndex(row, column)].points === -1;
+}
+
+/**
+ * Helper function to transform coordingates into a string of the form 'row,column' so we can store is in a set.
+ * This will allow for easy lookup of a placed tile coorinate when we do word building calculations
+ */
+function toPlacedTileString(row: number, column: number): string {
+  return `${row},${column}`;
 }

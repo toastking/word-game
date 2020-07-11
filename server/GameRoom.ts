@@ -1,16 +1,14 @@
-import { Room, Client } from "colyseus";
-import { Schema, type, MapSchema, ArraySchema } from "@colyseus/schema";
 import { Dispatcher } from "@colyseus/command";
-import { OnJoinCommand, OnLeaveCommand } from "./PlayerCommands";
-import { CreateDeckCommand } from "./TileCommands";
+import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
+import { Client, Room } from "colyseus";
 import {
+  BuildWordCommand,
   OnCreateCommand,
+  OnGameStartCommand,
   PlaceTileCommand,
   RemoveTileCommand,
-  OnGameStartCommand,
-  CheckWordsCommand,
 } from "./GameCommands";
-import { number } from "@colyseus/schema/lib/encoding/decode";
+import { OnJoinCommand, OnLeaveCommand } from "./PlayerCommands";
 
 /** Repressents a game tile */
 export class Tile extends Schema {
@@ -140,7 +138,7 @@ export class GameRoom extends Room<WordGameState> {
     );
 
     this.onMessage("playWord", () => {
-      this.dispatcher.dispatch(new CheckWordsCommand());
+      this.dispatcher.dispatch(new BuildWordCommand());
     });
   }
 
