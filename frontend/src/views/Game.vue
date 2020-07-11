@@ -114,9 +114,6 @@ export default Vue.extend({
       };
 
       this.$store.commit('setPlayerId', room.sessionId);
-
-      //TODO: remove this!!
-      this.$store.commit('gameOver');
     }
   },
   computed: {
