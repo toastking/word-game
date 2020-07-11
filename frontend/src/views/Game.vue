@@ -1,33 +1,11 @@
 <template>
   <section>
     <div class="container game-grid">
-      <div class="player-3-area">
-        <!-- Player 3 -->
-        <player-card
-          v-if="playerCount > 2"
-          :playerId="nonUserPlayersIds[1]"
-          :currentTurn="currentTurn"
-        ></player-card>
-      </div>
-      <!-- Game board and player areas-->
-      <div class="player-2-area">
-        <!-- Player 2 -->
-        <player-card
-          v-if="playerCount > 1"
-          :playerId="nonUserPlayersIds[0]"
-          :currentTurn="currentTurn"
-        ></player-card>
-      </div>
       <div class="game-board-area">
         <game-board></game-board>
       </div>
-      <div class="player-4-area">
-        <!-- Player 4 -->
-        <player-card
-          v-if="playerCount > 3"
-          :playerId="nonUserPlayersIds[2]"
-          :currentTurn="currentTurn"
-        ></player-card>
+      <div class="player-list-area">
+        <player-list class="player-list"></player-list>
       </div>
       <div class="player-1-area">
         <!-- User Player (Player 1) -->
@@ -62,6 +40,7 @@ import { mapState, mapGetters } from 'vuex';
 import { GameState } from '../store';
 import GameBoard from '@/components/GameBoard.vue';
 import GameOverModal from '@/components/GameOverModal.vue';
+import PlayerList from '@/components/PlayerList.vue';
 
 export default Vue.extend({
   created() {
@@ -124,7 +103,7 @@ export default Vue.extend({
       'playerId',
       'gameOver',
     ]),
-    ...mapGetters(['nonUserPlayerIds', 'playerCount', 'hasUserPlayer']),
+    ...mapGetters(['hasUserPlayer']),
   },
   components: {
     PlayerCard,
@@ -132,6 +111,7 @@ export default Vue.extend({
     GameButtons,
     GameBoard,
     GameOverModal,
+    PlayerList,
   },
 });
 </script>
@@ -140,24 +120,25 @@ export default Vue.extend({
 .game-grid {
   display: grid;
   grid-template-areas:
-    '. . player-3 . .'
-    'player-2 game-board  game-board game-board player-4'
-    '. . player-1 . .';
-  grid-template-columns: repeat(5, 1fr);
+    'game-board  game-board game-board player-list'
+    'player-1 player-1 player-1 .';
+  grid-template-columns: repeat(4, 1fr);
   row-gap: 10px;
   column-gap: 10px;
+  margin-top: 1em;
 }
 
-.player-3-area {
-  grid-area: player-3;
+.player-list-area {
+  grid-area: player-list;
+  display: flex;
 }
 
-.player-2-area {
-  grid-area: player-2;
-}
-
-.player-4-area {
-  grid-area: player-4;
+.player-list {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 0px;
+  margin-right: 0px;
+  flex: 1;
 }
 
 .player-1-area {
