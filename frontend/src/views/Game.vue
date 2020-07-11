@@ -1,54 +1,67 @@
 <template>
-  <div class="container game-grid">
-    <div class="player-3-area">
-      <!-- Player 3 -->
-      <player-card
-        v-if="playerCount > 2"
-        :playerId="nonUserPlayersIds[1]"
-        :currentTurn="currentTurn"
-      ></player-card>
+  <section>
+    <div class="container game-grid">
+      <div class="player-3-area">
+        <!-- Player 3 -->
+        <player-card
+          v-if="playerCount > 2"
+          :playerId="nonUserPlayersIds[1]"
+          :currentTurn="currentTurn"
+        ></player-card>
+      </div>
+      <!-- Game board and player areas-->
+      <div class="player-2-area">
+        <!-- Player 2 -->
+        <player-card
+          v-if="playerCount > 1"
+          :playerId="nonUserPlayersIds[0]"
+          :currentTurn="currentTurn"
+        ></player-card>
+      </div>
+      <div class="game-board-area">
+        <game-board></game-board>
+      </div>
+      <div class="player-4-area">
+        <!-- Player 4 -->
+        <player-card
+          v-if="playerCount > 3"
+          :playerId="nonUserPlayersIds[2]"
+          :currentTurn="currentTurn"
+        ></player-card>
+      </div>
+      <div class="player-1-area">
+        <!-- User Player (Player 1) -->
+        <template v-if="hasUserPlayer === true">
+          <game-buttons></game-buttons>
+          <game-tiles v-if="gameStarted === true"></game-tiles>
+          <player-card :playerId="playerId"></player-card>
+        </template>
+      </div>
     </div>
-    <!-- Game board and player areas-->
-    <div class="player-2-area">
-      <!-- Player 2 -->
-      <player-card
-        v-if="playerCount > 1"
-        :playerId="nonUserPlayersIds[0]"
-        :currentTurn="currentTurn"
-      ></player-card>
-    </div>
-    <div class="game-board-area">
-      <game-board></game-board>
-    </div>
-    <div class="player-4-area">
-      <!-- Player 4 -->
-      <player-card
-        v-if="playerCount > 3"
-        :playerId="nonUserPlayersIds[2]"
-        :currentTurn="currentTurn"
-      ></player-card>
-    </div>
-    <div class="player-1-area">
-      <!-- User Player (Player 1) -->
-      <template v-if="hasUserPlayer === true">
-        <game-buttons></game-buttons>
-        <game-tiles v-if="gameStarted === true"></game-tiles>
-        <player-card :playerId="playerId"></player-card>
-      </template>
-    </div>
-  </div>
+    <b-modal
+      :active.sync="gameOver"
+      has-modal-card
+      trap-focus
+      :destroy-on-hide="false"
+      aria-role="dialog"
+      aria-modal
+      :can-cancel="[]"
+    >
+      <game-over-modal></game-over-modal>
+    </b-modal>
+  </section>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import PlayerCard from '../components/PlayerCard.vue';
-import { Player } from '../schema/Player';
 import { colyseusService } from '../main';
 import GameTiles from '../components/GameTiles.vue';
 import GameButtons from '../components/GameButtons.vue';
-import { mapState, mapMutations, mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { GameState } from '../store';
 import GameBoard from '@/components/GameBoard.vue';
+import GameOverModal from '@/components/GameOverModal.vue';
 
 export default Vue.extend({
   created() {
@@ -77,6 +90,11 @@ export default Vue.extend({
             case 'currentTurn':
               this.$store.commit('updateCurrentTurn', change.value);
               break;
+            case 'gameOver':
+              if (change.value === true) {
+                this.$store.commit('gameOver');
+              }
+              break;
           }
         });
       };
@@ -96,6 +114,9 @@ export default Vue.extend({
       };
 
       this.$store.commit('setPlayerId', room.sessionId);
+
+      //TODO: remove this!!
+      this.$store.commit('gameOver');
     }
   },
   computed: {
@@ -104,6 +125,7 @@ export default Vue.extend({
       'gameStarted',
       'players',
       'playerId',
+      'gameOver',
     ]),
     ...mapGetters(['nonUserPlayerIds', 'playerCount', 'hasUserPlayer']),
   },
@@ -112,6 +134,7 @@ export default Vue.extend({
     GameTiles,
     GameButtons,
     GameBoard,
+    GameOverModal,
   },
 });
 </script>

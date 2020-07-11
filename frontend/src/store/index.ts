@@ -30,6 +30,8 @@ export interface GameState {
   };
   /** playerId for the currently selected user */
   playerId: string;
+
+  gameOver: boolean;
 }
 
 export default new Vuex.Store<GameState>({
@@ -41,6 +43,7 @@ export default new Vuex.Store<GameState>({
     selectedTile: -1,
     playerId: '',
     players: {},
+    gameOver: false,
   },
   mutations: {
     updateGameStarted(state, newVal: boolean) {
@@ -91,6 +94,9 @@ export default new Vuex.Store<GameState>({
     setPlayerId(state, playerId: string) {
       state.playerId = playerId;
     },
+    gameOver(state) {
+      state.gameOver = true;
+    },
   },
   getters: {
     /** Get the tile at a specified row and column in the grid */
@@ -112,6 +118,17 @@ export default new Vuex.Store<GameState>({
     },
     hasUserPlayer(state): boolean {
       return state.playerId in state.players;
+    },
+    playersInScoreOrder(state): PlayerState[] {
+      return Object.values(state.players).sort((player1, player2) => {
+        if (player1.score < player2.score) {
+          return -1;
+        }
+        if (player1.score === player2.score) {
+          return 0;
+        }
+        return 1;
+      });
     },
   },
   actions: {},
