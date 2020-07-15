@@ -102,3 +102,8 @@ dist
 
 # TernJS port file
 .tern-port
+data/certbot/conf/options-ssl-nginx.conf
+data/certbot/conf/ssl-dhparams.pem
+data/certbot/conf/accounts/acme-v02.api.letsencrypt.org/directory/920fa12614682a5f5ec2554ef38f0344/meta.json
+data/certbot/conf/accounts/acme-v02.api.letsencrypt.org/directory/920fa12614682a5f5ec2554ef38f0344/private_key.json
+data/certbot/conf/accounts/acme-v02.api.letsencrypt.org/directory/920fa12614682a5f5ec2554ef38f0344/regr.json
