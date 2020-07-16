@@ -7,7 +7,7 @@ services:
       - "8080:80"
     environment:
       - VIRTUAL_HOST=wordgame.zooted.app,wordgame.localhost
-      - LETSENCRYPT_HOST=wordgame.zooted.app,wordgame.localhost
+      - LETSENCRYPT_HOST=wordgame.zooted.app
   backend:
     build: ./server
     restart: always
@@ -15,7 +15,7 @@ services:
       - "2567:2567"
     environment:
       - VIRTUAL_HOST=api.zooted.app,api.localhost
-      - LETSENCRYPT_HOST=api.zooted.app,api.localhost
+      - LETSENCRYPT_HOST=api.zooted.app
   nginx-proxy:
     image: jwilder/nginx-proxy
     labels:
