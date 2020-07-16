@@ -8,6 +8,8 @@ services:
     environment:
       - VIRTUAL_HOST=wordgame.zooted.app,wordgame.localhost
       - LETSENCRYPT_HOST=wordgame.zooted.app
+    networks:
+      - web
   backend:
     build: ./server
     restart: always
@@ -16,6 +18,8 @@ services:
     environment:
       - VIRTUAL_HOST=api.zooted.app,api.localhost
       - LETSENCRYPT_HOST=api.zooted.app
+    networks:
+      - web
   nginx-proxy:
     image: jwilder/nginx-proxy
     labels:
@@ -25,21 +29,34 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - /etc/nginx/certs
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    networks:
+      - web
     depends_on:
       - backend
       - frontend
   nginx-proxy-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     volumes:
-      - /etc/nginx/certs
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:rw
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - DEFAULT_EMAIL=mattjdelsig@gmail.com
       - NGINX_PROXY_CONTAINER=nginx-proxy
+    networks:
+      - web
     depends_on:
       - nginx-proxy
+volumes:
+  vhost:
+  html:
+  certs:
+  dhparam:
+networks:
+  web:
+    external: true
