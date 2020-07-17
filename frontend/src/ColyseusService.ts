@@ -4,7 +4,7 @@ import { WordGameState } from './schema/WordGameState';
 /** Singleton wrapper so we can have a global colyseus service */
 export class ColyseusService {
   /** Game server client */
-  private readonly client = new Colyseus.Client('ws://api.localhost/');
+  private readonly client = new Colyseus.Client('ws://api.zooted.app/');
   room?: Colyseus.Room<WordGameState>;
 
   getLobby() {
