@@ -7,6 +7,8 @@ services:
       - VIRTUAL_HOST=wordgame.zooted.app,wordgame.localhost
       - LETSENCRYPT_HOST=wordgame.zooted.app
       - VIRTUAL_PORT=80
+    logging:
+      driver: "gcplogs"
     networks:
       - web
   backend:
@@ -16,6 +18,8 @@ services:
       - VIRTUAL_HOST=api.zooted.app,api.localhost
       - LETSENCRYPT_HOST=api.zooted.app
       - VIRTUAL_PORT=2567
+    logging:
+      driver: "gcplogs"
     networks:
       - web
   nginx-proxy:
@@ -33,6 +37,8 @@ services:
       - html:/usr/share/nginx/html
     networks:
       - web
+    logging:
+      driver: "gcplogs"
     depends_on:
       - backend
       - frontend
@@ -48,6 +54,8 @@ services:
       - NGINX_PROXY_CONTAINER=nginx-proxy
     networks:
       - web
+    logging:
+      driver: "gcplogs"
     depends_on:
       - nginx-proxy
 volumes:
