@@ -14,7 +14,12 @@
       ></b-icon>
       <p id="letter"></p>
     </div>
-    <game-tile v-else :tile="tile" v-on:tile-clicked="removeTile()"></game-tile>
+    <game-tile
+      v-else
+      :tile="tile"
+      :placedTile="placedTile"
+      v-on:tile-clicked="removeTile()"
+    ></game-tile>
   </div>
 </template>
 
@@ -55,7 +60,10 @@ export default Vue.extend({
       const midwayPoint = Math.floor(BOARD_SIZE / 2);
       return this.row === midwayPoint && this.column === midwayPoint;
     },
-    ...mapGetters(['getSelectedTile', 'getTile']),
+    placedTile(): boolean {
+      return this.isPlacedTile(this.row, this.column);
+    },
+    ...mapGetters(['getSelectedTile', 'getTile', 'isPlacedTile']),
   },
   methods: {
     placeTile() {
@@ -97,6 +105,10 @@ export default Vue.extend({
 
 .grid-space:hover {
   background: hsl(206, 70%, 96%);
+}
+
+.is-placed-tile {
+  border-color: ;
 }
 
 #letter {

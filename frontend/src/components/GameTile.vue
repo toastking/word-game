@@ -1,7 +1,11 @@
 <template>
   <div
     class="box game-tile"
-    :class="{ 'has-background-grey-lighter': isSelectedTile }"
+    :class="{
+      'has-background-grey-lighter': isSelectedTile,
+      'has-background-dark': placedTile,
+      'has-text-white-ter': placedTile,
+    }"
     @click="clicked()"
   >
     <p
@@ -22,6 +26,7 @@ export default Vue.extend({
   props: {
     tile: { type: Object as PropType<Tile>, required: true },
     idx: { type: Number, required: false },
+    placedTile: { type: Boolean, required: false },
   },
   computed: {
     ...mapState(['selectedTile']),

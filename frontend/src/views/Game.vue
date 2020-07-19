@@ -63,10 +63,19 @@ export default Vue.extend({
         this.$store.commit('updatePlayer', { player, id });
       };
 
+      //Setup updating the list of placed tiles
+      room.state.placedTiles.onAdd = (placedTile, idx) => {
+        this.$store.commit('updatePlacedTile', { placedTile, idx });
+      };
+      room.state.placedTiles.onChange = (placedTile, idx) => {
+        this.$store.commit('updatePlacedTile', { placedTile, idx });
+      };
+      room.state.placedTiles.onRemove = (_, idx) => {
+        this.$store.commit('removePlacedTile', idx);
+      };
+
       room.state.onChange = changes => {
         changes.forEach(change => {
-          console.log(change.field);
-          console.log(change.value);
           switch (change.field) {
             case 'gameStarted':
               this.$store.commit('updateGameStarted', change.value);

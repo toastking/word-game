@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { Tile } from '@/schema/Tile';
 import { Player } from '@/schema/Player';
+import { PlacedTile } from '@/schema/PlacedTile';
 
 Vue.use(Vuex);
 
@@ -32,6 +33,9 @@ export interface GameState {
   playerId: string;
 
   gameOver: boolean;
+
+  /** The tiles placed by a user */
+  placedTiles: PlacedTile[];
 }
 
 export default new Vuex.Store<GameState>({
@@ -44,6 +48,7 @@ export default new Vuex.Store<GameState>({
     playerId: '',
     players: {},
     gameOver: false,
+    placedTiles: [],
   },
   mutations: {
     updateGameStarted(state, newVal: boolean) {
@@ -107,10 +112,20 @@ export default new Vuex.Store<GameState>({
         playerId: '',
         players: {},
         gameOver: false,
+        placedTiles: [],
       };
       for (const key in initialState) {
         Vue.set(state, key, initialState[key]);
       }
+    },
+    updatePlacedTile(
+      state,
+      { placedTile, idx }: { placedTile: PlacedTile; idx: number }
+    ) {
+      Vue.set(state.placedTiles, idx, placedTile);
+    },
+    removePlacedTile(state, idx: number) {
+      Vue.delete(state.placedTiles, idx);
     },
   },
   getters: {
@@ -118,6 +133,14 @@ export default new Vuex.Store<GameState>({
     getTile(state) {
       return (idx: number) => {
         return state.gameBoard[idx];
+      };
+    },
+    /** Returns a getter for there's a placed tile at coordinates in the board */
+    isPlacedTile(state) {
+      return (row: number, column: number) => {
+        return state.placedTiles.some(placedTile => {
+          return placedTile.row === row && placedTile.column === column;
+        });
       };
     },
     getSelectedTile(state): Tile {
