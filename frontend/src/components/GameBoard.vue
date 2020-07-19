@@ -33,5 +33,8 @@ $grid-size: 15;
   display: grid;
   grid-template-rows: repeat($grid-size, 1fr);
   grid-template-columns: repeat($grid-size, 1fr);
+  max-width: 100%;
+  min-width: 0;
+  overflow: scroll;
 }
 </style>

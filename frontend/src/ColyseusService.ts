@@ -7,7 +7,7 @@ export class ColyseusService {
   private colyseusUrl =
     process.env.NODE_ENV === 'production'
       ? 'wss://api.zooted.app/'
-      : 'ws://api.localhost/';
+      : 'ws://localhost:2567/';
   private readonly client = new Colyseus.Client(this.colyseusUrl);
   room?: Colyseus.Room<WordGameState>;
 

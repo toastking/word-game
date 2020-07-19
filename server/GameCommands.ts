@@ -172,10 +172,19 @@ export class BuildWordCommand extends Command<WordGameState, {}> {
   }
 
   execute() {
-    //Add the placed word
     const words: Array<Tile[]> = [];
-    // Add the placed word to the list of letters
     const visited = new Set<string>();
+
+    if ((this.state.turn = 1)) {
+      // Make a word from the placed tiles only if it's the first turn
+      const word: Tile[] = [];
+      for (let placedTile of this.state.placedTiles) {
+        word.push(placedTile.tile);
+      }
+      words.push(word);
+
+      return [new AddToPlayerScore().setPayload({ words })];
+    }
 
     //Build words for each of the placed tiles by looking veritcally and horizontally
     for (let placedTile of this.state.placedTiles) {

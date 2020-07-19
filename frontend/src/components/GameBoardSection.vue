@@ -12,6 +12,7 @@
         icon="star"
         type="is-primary"
       ></b-icon>
+      <p id="letter"></p>
     </div>
     <game-tile v-else :tile="tile" v-on:tile-clicked="removeTile()"></game-tile>
   </div>
@@ -96,5 +97,10 @@ export default Vue.extend({
 
 .grid-space:hover {
   background: hsl(206, 70%, 96%);
+}
+
+#letter {
+  height: 1.5rem;
+  width: 1.5rem;
 }
 </style>
