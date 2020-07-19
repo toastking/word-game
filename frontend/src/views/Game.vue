@@ -44,6 +44,9 @@ import PlayerList from '@/components/PlayerList.vue';
 
 export default Vue.extend({
   created() {
+    //Reset the room state
+    this.$store.commit('resetGame');
+
     // Join the room and subsribe to colyseus updates
     const roomId = this.$route.params.roomId;
     const room = colyseusService.room;
@@ -62,6 +65,8 @@ export default Vue.extend({
 
       room.state.onChange = changes => {
         changes.forEach(change => {
+          console.log(change.field);
+          console.log(change.value);
           switch (change.field) {
             case 'gameStarted':
               this.$store.commit('updateGameStarted', change.value);

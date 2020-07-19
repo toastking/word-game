@@ -97,6 +97,21 @@ export default new Vuex.Store<GameState>({
     gameOver(state) {
       state.gameOver = true;
     },
+    resetGame(state) {
+      const initialState: GameState & { [key: string]: unknown } = {
+        currentTurn: '',
+        gameStarted: false,
+        gameBoard: [],
+        playerHand: [],
+        selectedTile: -1,
+        playerId: '',
+        players: {},
+        gameOver: false,
+      };
+      for (const key in initialState) {
+        Vue.set(state, key, initialState[key]);
+      }
+    },
   },
   getters: {
     /** Get the tile at a specified row and column in the grid */

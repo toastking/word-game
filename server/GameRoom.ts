@@ -94,7 +94,6 @@ export class GameRoom extends Room<WordGameState> {
   readonly dispatcher = new Dispatcher(this);
 
   onCreate(options: any) {
-    console.log("created");
     this.maxClients = 4;
     //Set the intial State
     this.setState(new WordGameState());
@@ -103,7 +102,6 @@ export class GameRoom extends Room<WordGameState> {
     this.dispatcher.dispatch(new OnCreateCommand());
 
     this.onMessage("startGame", () => {
-      console.log("startGame");
       this.dispatcher.dispatch(new OnGameStartCommand());
     });
 
@@ -144,6 +142,8 @@ export class GameRoom extends Room<WordGameState> {
 
   onJoin(client: Client, options: any) {
     console.log("joined");
+    console.log(options?.playerName);
+
     this.dispatcher.dispatch(new OnJoinCommand(), {
       sessionId: client.sessionId,
       name: options?.playerName,

@@ -4,7 +4,11 @@ import { WordGameState } from './schema/WordGameState';
 /** Singleton wrapper so we can have a global colyseus service */
 export class ColyseusService {
   /** Game server client */
-  private readonly client = new Colyseus.Client('wss://api.zooted.app/');
+  private colyseusUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'wss://api.zooted.app/'
+      : 'ws://api.localhost/';
+  private readonly client = new Colyseus.Client(this.colyseusUrl);
   room?: Colyseus.Room<WordGameState>;
 
   getLobby() {
@@ -13,7 +17,7 @@ export class ColyseusService {
 
   /** Create a game and player with the given player name */
   async createGame(playerName: string) {
-    this.room = await this.client.create('game', { playerNjjame: playerName });
+    this.room = await this.client.create('game', { playerName: playerName });
   }
 
   /** Join an in progress game and create a player */
