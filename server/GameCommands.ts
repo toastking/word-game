@@ -95,19 +95,11 @@ export class RemoveTileCommand extends Command<
   }
 }
 
-/** Interface representing a node in the trie */
-interface TrieNode {
-  letter: string;
-  points: number;
-  children: TrieNode[];
-  /** Whether or not we "reverse" the node */
-  reverse: boolean;
-}
-
 /** Builds words based on placed tiles. This constructs a trie of all the words. */
 export class BuildWordCommand extends Command<WordGameState, {}> {
   validate() {
     if (this.state.placedTiles.length === 0) {
+      this.state.currentPlayerAlert = "You must place one or more tiles";
       return false;
     }
 
@@ -137,7 +129,17 @@ export class BuildWordCommand extends Command<WordGameState, {}> {
       const validPlacement = this.state.placedTiles.some((tile) => {
         return tile.row === midwayPoint && tile.column === midwayPoint;
       });
-      return validPlacement && (isVerticalContiguous || isHorizontalContiguous);
+      if (!validPlacement) {
+        this.state.currentPlayerAlert =
+          "On the first turn, the word must go through the center space";
+        return false;
+      }
+      if (!(isVerticalContiguous || isHorizontalContiguous)) {
+        this.state.currentPlayerAlert =
+          "The placed word must be horizontal or vertical";
+        return false;
+      }
+      return true;
     } else {
       //If it's not the first turn, we also need to make sure this word intersects with another word at some point
       const coordinates = this.state.placedTiles.map((placedTile) =>
@@ -165,9 +167,19 @@ export class BuildWordCommand extends Command<WordGameState, {}> {
               !isEmptySpace(coords[0], coords[1], this.state.gameBoard)
           );
       });
-      return (
-        hasIntersections && (isVerticalContiguous || isHorizontalContiguous)
-      );
+
+      if (!hasIntersections) {
+        this.state.currentPlayerAlert =
+          "The placed word must intersect other words";
+        return false;
+      }
+
+      if (!(isVerticalContiguous || isHorizontalContiguous)) {
+        this.state.currentPlayerAlert =
+          "The placed word must be horizontal or vertical";
+        return false;
+      }
+      return true;
     }
   }
 

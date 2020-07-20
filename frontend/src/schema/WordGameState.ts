@@ -19,4 +19,5 @@ export class WordGameState extends Schema {
     @type("boolean") public gameOver: boolean;
     @type("boolean") public gameStarted: boolean;
     @type("number") public turn: number;
+    @type("string") public currentPlayerAlert: string;
 }

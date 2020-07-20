@@ -88,6 +88,10 @@ export class WordGameState extends Schema {
 
   @type("number")
   turn = 1;
+
+  /** Alert to display to the current player */
+  @type("string")
+  currentPlayerAlert = "";
 }
 
 export class GameRoom extends Room<WordGameState> {
@@ -141,9 +145,6 @@ export class GameRoom extends Room<WordGameState> {
   }
 
   onJoin(client: Client, options: any) {
-    console.log("joined");
-    console.log(options?.playerName);
-
     this.dispatcher.dispatch(new OnJoinCommand(), {
       sessionId: client.sessionId,
       name: options?.playerName,

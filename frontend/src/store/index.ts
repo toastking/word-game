@@ -36,6 +36,8 @@ export interface GameState {
 
   /** The tiles placed by a user */
   placedTiles: PlacedTile[];
+
+  playerAlertMessage: string;
 }
 
 export default new Vuex.Store<GameState>({
@@ -49,6 +51,7 @@ export default new Vuex.Store<GameState>({
     players: {},
     gameOver: false,
     placedTiles: [],
+    playerAlertMessage: '',
   },
   mutations: {
     updateGameStarted(state, newVal: boolean) {
@@ -113,6 +116,7 @@ export default new Vuex.Store<GameState>({
         players: {},
         gameOver: false,
         placedTiles: [],
+        playerAlertMessage: '',
       };
       for (const key in initialState) {
         Vue.set(state, key, initialState[key]);
@@ -126,6 +130,9 @@ export default new Vuex.Store<GameState>({
     },
     removePlacedTile(state, idx: number) {
       Vue.delete(state.placedTiles, idx);
+    },
+    setPlayerAlertMessage(state, message: string) {
+      state.playerAlertMessage = message;
     },
   },
   getters: {
@@ -167,6 +174,13 @@ export default new Vuex.Store<GameState>({
         }
         return 1;
       });
+    },
+    /** Get the alerts for the current player */
+    getPlayerAlert(state): string {
+      if (state.currentTurn === state.playerId) {
+        return state.playerAlertMessage;
+      }
+      return '';
     },
   },
   actions: {},

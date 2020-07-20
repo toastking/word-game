@@ -41,6 +41,7 @@ import { GameState } from '../store';
 import GameBoard from '@/components/GameBoard.vue';
 import GameOverModal from '@/components/GameOverModal.vue';
 import PlayerList from '@/components/PlayerList.vue';
+import { WordGameState } from '../schema/WordGameState';
 
 export default Vue.extend({
   created() {
@@ -76,7 +77,7 @@ export default Vue.extend({
 
       room.state.onChange = changes => {
         changes.forEach(change => {
-          switch (change.field) {
+          switch (change.field as keyof WordGameState) {
             case 'gameStarted':
               this.$store.commit('updateGameStarted', change.value);
               break;
@@ -87,6 +88,9 @@ export default Vue.extend({
               if (change.value === true) {
                 this.$store.commit('gameOver');
               }
+              break;
+            case 'currentPlayerAlert':
+              this.$store.commit('setPlayerAlertMessage', change.value);
               break;
           }
         });
@@ -117,7 +121,17 @@ export default Vue.extend({
       'playerId',
       'gameOver',
     ]),
-    ...mapGetters(['hasUserPlayer']),
+    ...mapGetters(['hasUserPlayer', 'getPlayerAlert']),
+  },
+  watch: {
+    getPlayerAlert(newAlert) {
+      if (newAlert !== '') {
+        this.$buefy.dialog.alert({
+          title: 'Issue with placed word',
+          message: newAlert,
+        });
+      }
+    },
   },
   components: {
     PlayerCard,

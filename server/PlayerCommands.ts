@@ -30,6 +30,10 @@ export class NextPlayerCommand extends Command<WordGameState, {}> {
     const currentIdx = ids.findIndex((id) => id === this.state.currentTurn);
     const nextIdx = (currentIdx + 1) % ids.length;
     this.state.currentTurn = ids[nextIdx];
+
+    //Reset the alert message
+    this.state.currentPlayerAlert = "";
+
     if (currentIdx === ids.length - 1) {
       return [new IncrementTurnCommand()];
     }
