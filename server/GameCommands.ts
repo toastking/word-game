@@ -65,32 +65,40 @@ export class PlaceTileCommand extends Command<
 /** Command to remove a tile */
 export class RemoveTileCommand extends Command<
   WordGameState,
-  { tile: PlacedTile; sessionId: string }
+  { row: number; column: number; sessionId: string }
 > {
-  validate({ tile, sessionId }: this["payload"]) {
+  validate({ row, column, sessionId }: this["payload"]) {
     if (this.state.currentTurn !== sessionId) {
       return false;
     }
 
     return this.state.placedTiles.some(
-      (placedTile) =>
-        placedTile.row === tile.row && placedTile.column === tile.column
+      (placedTile) => placedTile.row === row && placedTile.column === column
     );
   }
 
-  execute({ tile, sessionId }: this["payload"]) {
+  execute({ row, column, sessionId }: this["payload"]) {
     const indexToRemove = this.state.placedTiles.findIndex(
-      (placedTile) =>
-        placedTile.row === tile.row && placedTile.column === tile.column
+      (placedTile) => placedTile.row === row && placedTile.column === column
     );
     // If it found the value remove it from both the tile list and the game board
     if (indexToRemove >= 0) {
-      this.state.placedTiles.splice(indexToRemove, 1);
-      const idx = calculatedIndex(tile.row, tile.column);
+      const placedTile: PlacedTile = this.state.placedTiles.splice(
+        indexToRemove,
+        1
+      )[0];
+      const idx = calculatedIndex(row, column);
       this.state.gameBoard[idx] = new Tile();
 
+      //If it's a blank tile get rid of the letter
+      if (placedTile.isBlankTile === true) {
+        placedTile.tile.letter = "";
+      }
+
       //Add the removed tile to the players hand
-      (this.state.players[sessionId] as Player).hand.push(tile.tile.clone());
+      (this.state.players[sessionId] as Player).hand.push(
+        placedTile.tile.clone()
+      );
     }
   }
 }

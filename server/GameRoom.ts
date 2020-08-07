@@ -35,13 +35,17 @@ export class PlacedTile extends Schema {
   column: number;
   @type(Tile)
   tile: Tile;
+  /** Whether or not the tile was a blank tile. This is needed for determining what happens when we withdraw it */
+  @type("boolean")
+  isBlankTile: boolean;
 
-  constructor(row: number, column: number, tile: Tile) {
+  constructor(row: number, column: number, tile: Tile, isBlankTile?: boolean) {
     super();
 
     this.row = row;
     this.column = column;
     this.tile = tile;
+    this.isBlankTile = isBlankTile ?? false;
   }
 }
 
@@ -123,17 +127,32 @@ export class GameRoom extends Room<WordGameState> {
         });
       }
     );
-
     this.onMessage(
-      "removeTile",
+      "placeBlankTile",
       (
         client,
         message: { row: number; column: number; letter: string; points: number }
       ) => {
         const tile = new Tile(message.letter, message.points);
-        const placedTile = new PlacedTile(message.row, message.column, tile);
-        this.dispatcher.dispatch(new RemoveTileCommand(), {
+        const placedTile = new PlacedTile(
+          message.row,
+          message.column,
+          tile,
+          true
+        );
+        this.dispatcher.dispatch(new PlaceTileCommand(), {
           tile: placedTile,
+          sessionId: client.sessionId,
+        });
+      }
+    );
+
+    this.onMessage(
+      "removeTile",
+      (client, message: { row: number; column: number }) => {
+        this.dispatcher.dispatch(new RemoveTileCommand(), {
+          row: message.row,
+          column: message.column,
           sessionId: client.sessionId,
         });
       }

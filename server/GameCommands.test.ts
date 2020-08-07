@@ -197,7 +197,8 @@ describe("GameCommands", () => {
     type PlaceTileTestExpectedTupe = [Tile[], PlacedTile[]];
     type PlaceTileTestTuple = [
       string,
-      PlacedTile,
+      number,
+      number,
       Tile[],
       PlacedTile[],
       PlaceTileTestExpectedTupe
@@ -206,9 +207,7 @@ describe("GameCommands", () => {
     //Test One: invalid placement
     const board2: Tile[] = new Array(BOARD_SIZE * BOARD_SIZE).fill(new Tile());
 
-    const tile2Tile = new Tile();
-    tile2Tile.letter = "A";
-    tile2Tile.points = 2;
+    const tile2Tile = new Tile("A", 2);
     const tile2 = new PlacedTile(4, 0, tile2Tile);
     board2[calculatedIndex(tile2.row, tile2.column)] = tile2Tile;
     const expectedBoard2 = [...board2];
@@ -223,10 +222,11 @@ describe("GameCommands", () => {
     const tile1 = new PlacedTile(4, 0, tile1Tile);
 
     test.each<PlaceTileTestTuple>([
-      ["Invalid space", tile1, board1, [], [board1, []]],
+      ["Invalid space", tile1.row, tile1.column, board1, [], [board1, []]],
       [
         "Valid space",
-        tile2,
+        tile2.row,
+        tile2.column,
         board2,
         [tile2],
         [expectedBoard2, expectedPlacedTiles2],
@@ -235,14 +235,14 @@ describe("GameCommands", () => {
       "%s",
       (
         _,
-        placedTile,
+        row,
+        column,
         gameBoard,
         placedTiles,
         [expectedBoard, expectedPlacedTiles]
       ) => {
         room.state.gameBoard.push(...gameBoard);
         const player = new Player();
-        player.hand.push(placedTile.tile);
         room.state.players["id"] = player;
         room.state.currentTurn = "id";
 
@@ -253,7 +253,8 @@ describe("GameCommands", () => {
         const dispatcher = new Dispatcher(room);
 
         dispatcher.dispatch(new RemoveTileCommand(), {
-          tile: placedTile,
+          row,
+          column,
           sessionId: "id",
         });
 
