@@ -49,7 +49,7 @@ export default Vue.extend({
         this.roomId,
         this.playerName
       );
-      this.$router.push({ name: 'Game', params: { roomId } });
+      this.$router.push({ name: 'Game', params: { roomId: roomId } });
     },
   },
 });
