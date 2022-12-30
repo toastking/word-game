@@ -38,7 +38,7 @@
     "@colyseus/schema": "^0.5.40",
     "@colyseus/social": "^0.10.9",
     "@types/jest": "^26.0.3",
-    "colyseus": "^0.13.7",
+    "colyseus": "^0.14.24",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-jwt": "^5.3.1"
